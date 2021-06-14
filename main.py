@@ -110,10 +110,14 @@ def learnNewWords(words, settings, logs):
 def repeat(words, settings, logs):
     clear()
     toRepeat = []
+    toRepeatToday = []
     now = time.time()
+    toEnd = now+3600*4
     for i in range(len(words)):
         if words[i]["date"] < now and words[i]["date"] != 0:
             toRepeat.append(i)
+        elif words[i]["date"] > now and words[i]["date"]<toEnd:
+            toRepeatToday.append(i)
     if not toRepeat:
         firstWord = words[0]["date"]
         for i in range(1, len(words)):
@@ -127,9 +131,13 @@ def repeat(words, settings, logs):
             date[3] = "0" + str(date[3])
     notCorrect = []
     if len(toRepeat) == 0:
-        print("No words to repeat.\nFirst word to repeat at: {}.{} - {}:{}".format(date[0], date[1], date[2], date[3]))
+        print("No words to repeat.\nFirst word to repeat at: {}.{} - {}:{}\nThere is {} to repeat today.".format(date[0], date[1], date[2], date[3], len(toRepeatToday)))
+        print("Do you want to repeat them earlier? (Y/N)")
         a = input()
-        return words, settings, logs
+        if a == "Y":
+            toRepeat = toRepeatToday
+        else:
+            return words, settings, logs
     while True:
         clear()
         print("Words to repeat: {}".format(len(notCorrect+toRepeat)))
@@ -246,7 +254,7 @@ def showLogs(logs):
         log = {}
         d0 = (int(time.time())+7200)//(3600*24)
         for i in logs:
-            day = str((i["time"]+7200)//(3600*24)-d0)
+            day = str(int((i["time"]+7200)//(3600*24)-d0))
             if day not in log.keys():
                 log[day] = [[], []]
             if i["wordIndex"] not in log[day][0] and i["count"]==1 and i["nextI"] == 0:
@@ -290,25 +298,55 @@ def showLogs(logs):
                 toRepeat.append(0)
             
         fig, ax = plt.subplots()
+        tickNumber = int(len(days)/10)
+        if not tickNumber:
+            tickNumber = 1
+        ticks = []
+        for i in days:
+            if int(i)%tickNumber==0:
+                ticks.append(i)
+            else:
+                ticks.append("")
+
         ax.bar(days, new, label="new words")
         ax.bar(days, old, label="repeated words", bottom=new)
-        ax.bar(days, toRepeat, label="repeat in future", bottom=[new[i]+old[i] for i in range(len(days))])
+        ax.bar(days, toRepeat, label="repeat in future", bottom=[new[i]+old[i] for i in range(len(days))], tick_label=ticks)
         ax.legend()
     elif answer == "3":
         log = {}
         d0 = (logs[0]["time"]+7200)//(3600*24)
         for i in logs:
-            day = str((i["time"]+7200)//(3600*24)-d0)
+            day = str(int((i["time"]+7200)//(3600*24)-d0))
             if day not in log.keys():
                 log[day] = []
             log[day].append(i["correct"])
         days = []
         toShow = []
+
         for i in log.keys():
             days.append(int(i))
             toShow.append(log[i].count(1)/(log[i].count(1)+log[i].count(0)))
+
+        for i in range(max(days)):
+            if i not in days:
+                days.append(i)
+                toShow.append(0)
+
+        toShow = [x for _,x in sorted(zip(days, toShow))]
+        days.sort()
+        tickNumber = int(len(days)/5)
+        if not tickNumber:
+            tickNumber = 1
+        ticks = []
+        for i in days:
+            if i%tickNumber==0:
+                ticks.append(i)
+            else:
+                ticks.append("")
+
         fig, ax = plt.subplots()
-        ax.bar(days, toShow)
+        ax.bar(days, toShow, tick_label=ticks, label="accuracy daily")
+        ax.legend()
     elif answer == "4":
         log = {}
         for i in range(96):
@@ -326,10 +364,16 @@ def showLogs(logs):
                 toShow.append(log[i].count(1)/(log[i].count(0)+log[i].count(1)))
             else:
                 toShow.append(0)
+        hrsToShow = []
+        for i, j in enumerate(hrs):
+            if i%2==0:
+                hrsToShow.append(j)
+            else:
+                hrsToShow.append("")
         fig, ax = plt.subplots()
         plt.xticks(rotation=90)
-        ax.bar(hrs, toShow)
-    
+        ax.bar(hrs, toShow, label="accuracy hourly", tick_label=hrsToShow)
+        ax.legend()
     plt.show()
         
     a = input()
