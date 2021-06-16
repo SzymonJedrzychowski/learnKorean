@@ -1,10 +1,15 @@
 import time
 import json
 import random
-from os import system, name
+from os import system, name, listdir
 import matplotlib.pyplot as plt
 
+#All data is saved with UTC time, difference must be calculated to make the program work correctly in different time-zones.
+global SECONDS_DIFFERENCE
+SECONDS_DIFFERENCE = time.localtime().tm_gmtoff
+
 def clear(): 
+    """Clear the whole terminal display."""
 
     if name == 'nt': 
         _ = system('cls')  
@@ -12,7 +17,8 @@ def clear():
         _ = system('clear')
 
 def superMemo(answerQuality:int, currentStreak:int, easeRatio:float, interval:int):
-
+    """Returns updatet parameters for the word that was repeated."""
+    
     if answerQuality == 1:
         if currentStreak == 0:
             interval = 1
@@ -30,16 +36,19 @@ def superMemo(answerQuality:int, currentStreak:int, easeRatio:float, interval:in
     else:
         currentStreak = 0
         interval = 1
-        easeRatio -= 0.1
+        easeRatio -= 0.3
 
     return currentStreak, easeRatio, interval
 
-def learnNewWords(words, settings, logs):
+def learnNewWords(words: list, settings: dict, logs: list):
+    """Full process of learning new words."""
 
     clear()
 
     wordsToLearn = []
     wordIndex = 0
+    isLastCorrect = True
+    
     while len(wordsToLearn) < settings["maxWords"]:
         if words[wordIndex]["count"] == 0:
             wordsToLearn.append(wordIndex)
@@ -48,7 +57,6 @@ def learnNewWords(words, settings, logs):
         if wordIndex==len(words):
             break
 
-    isLastCorrect = True
     while True:
 
         clear()
@@ -59,19 +67,21 @@ def learnNewWords(words, settings, logs):
         if isLastCorrect:
             currentIndex = random.choice(wordsToLearn)
             currentWord = words[currentIndex]
-        print("Word: " + currentWord["han"])
-        print()
-        print("Translation: " + currentWord["eng"])
-        print()
+            
+        print("Word: {}\n".format(currentWord["han"]))
+        print("Translation: {}\n".format(currentWord["eng"]))
+
         t1 = time.time()
-        lastWord = input("Repeat: ")
+        answer = input("Repeat: ")
         t2 = time.time()
-        print()
-        if lastWord == currentWord["han"].split("(")[0]:
-            print("Correct!")
+
+        if answer == currentWord["han"].split("(")[0]:
+            print("\nCorrect!\n")
+
             isLastCorrect = True
             words[currentIndex]["date"] = int(time.time())
             words[currentIndex]["count"] += 1
+
             logs.append({
                 "wordIndex": currentIndex,
                 "correct": 1,
@@ -81,14 +91,13 @@ def learnNewWords(words, settings, logs):
                 "ease": words[currentIndex]["ef"],
                 "timeSpent": round(t2-t1, 1)
             })
+
             wordsToLearn.remove(currentIndex)
-            a = input()
+            _ = input()
+
         else:
-            words[currentIndex]["count"] += 1
-            words[currentIndex]["ef"] -= 0.1
-            if words[currentIndex]["ef"] < 2:
-                words[currentIndex]["ef"] = 2
-            print("Incorrect!")
+            print("\nIncorrect!\n")
+
             logs.append({
                 "wordIndex": currentIndex,
                 "correct": 0,
@@ -98,13 +107,16 @@ def learnNewWords(words, settings, logs):
                 "ease": words[currentIndex]["ef"],
                 "timeSpent": round(t2-t1, 1)
             })
+
             isLastCorrect = False
-            a = input()
-        print()
+            _ = input()
+
         if len(wordsToLearn) == 0:
             print("===")
             print("Learning has ended.")
-            a = input()
+
+            _ = input()
+
             return words, settings, logs
 
 def repeat(words, settings, logs):
@@ -140,12 +152,11 @@ def repeat(words, settings, logs):
             return words, settings, logs
     while True:
         clear()
-        print("Words to repeat: {}".format(len(notCorrect+toRepeat)))
-        print()
+        print("Words to repeat: {}\n".format(len(notCorrect+toRepeat)))
         currentIndex = random.choice(toRepeat+notCorrect)
         currentWord = words[currentIndex]
         print("===\n (0. to exit)\n")
-        print("Word: " + currentWord["eng"] + "\n")
+        print("Word: {}\n".format(currentWord["eng"]))
         t1 = time.time()
         answer = input("Translation: ")
         t2 = time.time()
@@ -252,9 +263,9 @@ def showLogs(logs):
         pass
     elif answer == "1":
         log = {}
-        d0 = (int(time.time())+7200)//(3600*24)
+        d0 = (int(time.time())+SECONDS_DIFFERENCE)//(3600*24)
         for i in logs:
-            day = str(int((i["time"]+7200)//(3600*24)-d0))
+            day = str(int((i["time"]+SECONDS_DIFFERENCE)//(3600*24)-d0))
             if day not in log.keys():
                 log[day] = [[], []]
             if i["wordIndex"] not in log[day][0] and i["count"]==1 and i["nextI"] == 0:
@@ -264,7 +275,7 @@ def showLogs(logs):
 
         log2 = {}
         for j, i in enumerate(words):
-            day = str(int((i["date"]+7200)//(3600*24)-d0))
+            day = str(int((i["date"]+SECONDS_DIFFERENCE)//(3600*24)-d0))
             
             if int(day)>=0:
                 if day not in log2.keys():
@@ -314,9 +325,9 @@ def showLogs(logs):
         ax.legend()
     elif answer == "3":
         log = {}
-        d0 = (logs[0]["time"]+7200)//(3600*24)
+        d0 = (logs[0]["time"]+SECONDS_DIFFERENCE)//(3600*24)
         for i in logs:
-            day = str(int((i["time"]+7200)//(3600*24)-d0))
+            day = str(int((i["time"]+SECONDS_DIFFERENCE)//(3600*24)-d0))
             if day not in log.keys():
                 log[day] = []
             log[day].append(i["correct"])
@@ -352,7 +363,7 @@ def showLogs(logs):
         for i in range(96):
             log[i] = []
         for i in logs:
-            log[(i["time"]+7200)%(3600*24)//900].append(i["correct"])
+            log[(i["time"]+SECONDS_DIFFERENCE)%(3600*24)//900].append(i["correct"])
         toShow = []
         hrs = []
         for i in log.keys():
@@ -384,11 +395,15 @@ with open("data.json", "r") as rd:
     settings = data["settings"]
     logs = data["logs"]
 
+allFiles = listdir('saves')
+if (int(allFiles[-1].split("-")[1].strip(".json"))+SECONDS_DIFFERENCE)//(3600*24) != int((time.time()+SECONDS_DIFFERENCE)//(24*3600)):
+    with open("saves/dataSave-{}.json".format(int(time.time())), "w") as sv:
+        json.dump(data, sv)
+
 today = time.localtime()
 
-if today.tm_mday != settings["today"]["date"][2] or today.tm_mon != settings["today"]["date"][1]:
-    settings["today"]["date"] = today
-    settings["today"]["words"] = 0
+if today.tm_mday != settings["date"][2] or today.tm_mon != settings["date"][1]:
+    settings["date"] = today
 
 while True:
     clear()
@@ -410,4 +425,4 @@ with open("data.json", "w") as sv:
     data["words"] = words
     data["settings"] = settings
     data["logs"] = logs
-    data = json.dump(data, sv)
+    json.dump(data, sv)
