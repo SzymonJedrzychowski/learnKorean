@@ -1,9 +1,10 @@
 import time
 import json
 import random
-from os import system, name, listdir
+from os import system, name
 import matplotlib.pyplot as plt
 from playsound import playsound
+from fileOperations import *
 
 # All data is saved with UTC time, difference must be calculated to make the program work correctly in different time-zones.
 global SECONDS_DIFFERENCE
@@ -858,27 +859,44 @@ def showLogs(words, logs):
 def main():
     """Main function."""
 
+    clear()
+    with open("data.json", "r") as rd:
+        lastFileTime = json.load(rd)["settings"]["time"]
+
+    try:
+        result = load(lastFileTime)
+        if result == True:
+            print("Files are in sync...")
+        
+        elif result == False:
+            print("File from this machine is older than from web...\nManage the files correctly before running program...\n")
+            
+            _ = input("Press enter to exit the program...")
+            exit()
+        
+        else:
+            print("Newest file was was downloaded...\n")
+
+    except Exception as ex:
+        print(ex)
+        print("There was problem downloading file...\nMake sure you have internet connection...\n")
+        
+        _ = input("Press enter to exit the program...")
+        exit()
+
     with open("data.json", "r") as rd:
         data = json.load(rd)
         words = data["words"]
         settings = data["settings"]
         logs = data["logs"]
 
-    allFiles = listdir('saves')
-
-    try:
-        if (int(allFiles[-1].split("-")[1].strip(".json"))+SECONDS_DIFFERENCE)//(3600*24) != int((time.time()+SECONDS_DIFFERENCE)//(24*3600)):
-            with open("saves/dataSave-{}.json".format(int(time.time())), "w") as sv:
-                json.dump(data, sv)
-    except:
-        with open("saves/dataSave-{}.json".format(int(time.time())), "w") as sv:
-            json.dump(data, sv)
-
     today = time.localtime()
 
     if today.tm_mday != settings["date"][2] or today.tm_mon != settings["date"][1]:
         settings["date"] = today
         settings["words"] = 0
+
+    _ = input("Press enter to continue...")
 
     while True:
         clear()
@@ -901,11 +919,19 @@ def main():
         elif dec == "3":
             showLogs(words, logs)
 
+    settings["time"] = int(time.time())
+
     with open("data.json", "w") as sv:
         data["words"] = words
         data["settings"] = settings
         data["logs"] = logs
         json.dump(data, sv)
 
+    save(settings["time"])
+
+    clear()
+    print("Data was saved...")
+    
+    _ = input("Press enter to exit the program...")
 
 main()
