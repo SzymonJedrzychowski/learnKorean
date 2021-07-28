@@ -21,10 +21,10 @@ def clear():
         _ = system('clear')
 
 
-def superMemo(answerQuality: int, currentStreak: int, easeRatio: float, interval: int):
+def superMemo(answer: int, currentStreak: int, easeRatio: float, interval: int):
     """Returns updatet parameters for the word that was repeated."""
 
-    if answerQuality == 1:
+    if answer == 1:
         if currentStreak == 0:
             interval = 1
 
@@ -163,7 +163,9 @@ def learnNewWords(words: list, settings: dict, logs: list):
                 "count": words[currentIndex]["count"],
                 "nextI": 0,
                 "ease": words[currentIndex]["ef"],
-                "timeSpent": round(afterWordTime-beforeWordTime, 1)
+                "timeSpent": round(afterWordTime-beforeWordTime, 1),
+                "localTime": SECONDS_DIFFERENCE,
+                "currentStreak": 0
             })
 
             settings["words"] += 1
@@ -223,7 +225,7 @@ def repeat(words, settings, logs):
     toRepeatToday = []
 
     currentTime = time.time()
-    toEnd = currentTime-SECONDS_DIFFERENCE+3600*(24-(currentTime/3600) % 24)
+    toEnd = currentTime+SECONDS_DIFFERENCE+3600*(24-((currentTime+SECONDS_DIFFERENCE)/3600) % 24)
 
     for i in range(len(words)):
         if words[i]["date"] < currentTime and words[i]["date"] != 0:
@@ -299,7 +301,9 @@ def repeat(words, settings, logs):
                 "count": words[currentIndex]["count"],
                 "nextI": words[currentIndex]["i"],
                 "ease": words[currentIndex]["ef"],
-                "timeSpent": round(afterWordTime-beforeWordTime, 1)
+                "timeSpent": round(afterWordTime-beforeWordTime, 1),
+                "localTime": SECONDS_DIFFERENCE,
+                "currentStreak": words[currentIndex]["currentStreak"]
             })
 
             toRepeat.remove(currentIndex)
@@ -332,7 +336,9 @@ def repeat(words, settings, logs):
                 "count": words[currentIndex]["count"],
                 "nextI": words[currentIndex]["i"],
                 "ease": words[currentIndex]["ef"],
-                "timeSpent": round(afterWordTime-beforeWordTime, 1)
+                "timeSpent": round(afterWordTime-beforeWordTime, 1),
+                "localTime": SECONDS_DIFFERENCE,
+                "currentStreak": 1
             })
 
             notCorrect.remove(currentIndex)
@@ -376,34 +382,26 @@ def repeat(words, settings, logs):
                         time.time())+words[currentIndex]["i"]*24*3600
                     words[currentIndex]["count"] += 1
 
-                    logs.append({
-                        "wordIndex": currentIndex,
-                        "correct": 1,
-                        "time": int(time.time()),
-                        "count": words[currentIndex]["count"],
-                        "nextI": words[currentIndex]["i"],
-                        "ease": words[currentIndex]["ef"],
-                        "timeSpent": round(afterWordTime-beforeWordTime, 1)
-                    })
-
                     toRepeat.remove(currentIndex)
 
-                if currentIndex in notCorrect:
+                elif currentIndex in notCorrect:
                     words[currentIndex]["n"], words[currentIndex]["ef"], _ = superMemo(
                         1, currentWord["n"], currentWord["ef"], currentWord["i"])
                     words[currentIndex]["count"] += 1
 
-                    logs.append({
-                        "wordIndex": currentIndex,
-                        "correct": 1,
-                        "time": int(time.time()),
-                        "count": words[currentIndex]["count"],
-                        "nextI": words[currentIndex]["i"],
-                        "ease": words[currentIndex]["ef"],
-                        "timeSpent": round(afterWordTime-beforeWordTime, 1)
-                    })
-
                     notCorrect.remove(currentIndex)
+
+                logs.append({
+                    "wordIndex": currentIndex,
+                    "correct": 1,
+                    "time": int(time.time()),
+                    "count": words[currentIndex]["count"],
+                    "nextI": words[currentIndex]["i"],
+                    "ease": words[currentIndex]["ef"],
+                    "timeSpent": round(afterWordTime-beforeWordTime, 1),
+                    "localTime": SECONDS_DIFFERENCE,
+                    "currentStreak": words[currentIndex]["currentStreak"]
+                })
 
             else:
                 words[currentIndex]["n"], words[currentIndex]["ef"], words[currentIndex]["i"] = superMemo(
@@ -419,7 +417,9 @@ def repeat(words, settings, logs):
                     "count": words[currentIndex]["count"],
                     "nextI": words[currentIndex]["i"],
                     "ease": words[currentIndex]["ef"],
-                    "timeSpent": round(afterWordTime-beforeWordTime, 1)
+                    "timeSpent": round(afterWordTime-beforeWordTime, 1),
+                    "localTime": SECONDS_DIFFERENCE,
+                    "currentStreak": 0
                 })
 
                 if currentIndex in toRepeat:
@@ -440,327 +440,153 @@ def showLogs(words, logs):
         clear()
         print("0. Exit")
         print("1. Words daily")
-        print("2. Words type daily.")
-        print("3. Words from previous day daily.")
+        print("2. Words type daily")
+        print("3. Words from previous day daily")
         print("4. Accuracy daily")
         print("5. Accuracy hours")
         print("6. Word types")
-        print("7. Ease factor")
+        print("7. Word types history")
+        print("8. Ease factor")
 
         answer = input()
 
         if answer == "0":
             break
 
-        elif answer == "1":
-            log = {}
-            d0 = (int(time.time())+SECONDS_DIFFERENCE)//(3600*24)
+        if answer in [str(i) for i in range(1, 9)]:
+            fig, ax = plt.subplots()
+        
+        
+        d0 = (int(time.time())+SECONDS_DIFFERENCE)//(3600*24)
+        allWordsLastDifference = {}
+
+        for i in logs:
+            day = str(int((i["time"]+i["localTime"])//(3600*24)-d0))
+            allWordsLastDifference[i["wordIndex"]] = i["localTime"]
+
+        if answer in ["1", "2", "3", "4", "7"]:
+            firstDay = (logs[0]["time"]+logs[0]["localTime"])//(3600*24)
+            lastDay = max([words[i]["date"]+allWordsLastDifference[i] for i in range(len(allWordsLastDifference))])//(3600*24)
+
+            if answer == "1":
+                days = [str(i-d0) for i in range(firstDay, lastDay+1)]
+            
+            else:
+                days = [str(i-d0) for i in range(firstDay, d0+1)]
+
+            tickNumber = int(len(days)/10)
+            ticks = []
+
+            if not tickNumber:
+                tickNumber = 1
+
+            for i in days:
+                if int(i) % tickNumber == 0:
+                    ticks.append(i)
+
+                else:
+                    ticks.append("")
+
+        if answer == "1":
+            wordsLog = [[0,0,0] for i in days]
 
             for i in logs:
-                day = str(int((i["time"]+SECONDS_DIFFERENCE)//(3600*24)-d0))
+                if i["correct"] == 0:
+                    continue
 
-                if day not in log.keys():
-                    log[day] = [[], []]
+                day = str(int((i["time"]+i["localTime"])//(3600*24)-d0))
 
-                if i["wordIndex"] not in log[day][0] and i["count"] == 1 and i["nextI"] == 0:
-                    log[day][0].append(i["wordIndex"])
-
-                elif i["nextI"] > 0 and i["wordIndex"] not in log[day][1]:
-                    log[day][1].append(i["wordIndex"])
-
-            log2 = {}
+                if i["count"] == 1:
+                    wordsLog[days.index(day)][0] += 1
+                
+                else:
+                    wordsLog[days.index(day)][1] += 1
 
             for j, i in enumerate(words):
-                day = str(int((i["date"]+SECONDS_DIFFERENCE)//(3600*24)-d0))
+                try:
+                    day = str(int((i["date"]+allWordsLastDifference[j])//(3600*24)-d0))
 
-                if int(day) >= 0:
-                    if day not in log2.keys():
-                        log2[day] = []
+                    wordsLog[days.index(day)][2] += 1
+                except:
+                    pass
 
-                    log2[day].append(j)
-
-            old = []
-            new = []
-            toRepeat = []
-
-            days = list(log.keys())+list(log2.keys())
-
-            if days.count("0") > 1:
-                days.remove("0")
-
-            days = [int(i) for i in days]
-            days.sort()
-
-            for i in range(days[0], days[-1]):
-                if i not in days:
-                    days.append(i)
-
-            days.sort()
-            days = [str(i) for i in days]
-
-            for i in days:
-                if i in log.keys():
-                    old.append(len(log[i][1]))
-                    new.append(len(log[i][0]))
-
-                else:
-                    old.append(0)
-                    new.append(0)
-
-                if i in log2.keys():
-                    toRepeat.append(len(log2[i]))
-
-                else:
-                    toRepeat.append(0)
-
-            fig, ax = plt.subplots()
-            tickNumber = int(len(days)/10)
-            ticks = []
-
-            if not tickNumber:
-                tickNumber = 1
-
-            for i in days:
-                if int(i) % tickNumber == 0:
-                    ticks.append(i)
-
-                else:
-                    ticks.append("")
-
-            ax.bar(days, new, label="new words")
-            ax.bar(days, old, label="repeated words", bottom=new)
-            ax.bar(days, toRepeat, label="repeat in future", bottom=[
-                   new[i]+old[i] for i in range(len(days))], tick_label=ticks)
-
-            ax.legend()
-
+            ax.bar(days, [i[0] for i in wordsLog], label="new words")
+            ax.bar(days, [i[1] for i in wordsLog], label="repeated words", bottom=[i[0] for i in wordsLog])
+            ax.bar(days, [i[2] for i in wordsLog], label="words to repeat", bottom=[i[0]+i[1] for i in wordsLog], tick_label=ticks)
+                
         elif answer == "2":
-            log = {}
-            wordsLog = {}
-            d0 = (int(time.time())+SECONDS_DIFFERENCE)//(3600*24)
+            wordsLog = [[0,0,0,0,0,0] for i in range(d0-firstDay+1)]
 
             for i in logs:
-                day = str(int((i["time"]+SECONDS_DIFFERENCE)//(3600*24)-d0))
+                if i["count"] == 1 or i["correct"] == 0:
+                    continue
 
-                if day not in log.keys():
-                    log[day] = []
+                day = str(int((i["time"]+i["localTime"])//(3600*24)-d0))
 
-                if i["wordIndex"] not in wordsLog:
-                    wordsLog[i["wordIndex"]] = {
-                        "array": [], "index": 0, "streak": 0}
-
-                if i["correct"] == 1 and i["count"] > 1:
-                    log[day].append(i["wordIndex"])
-                    wordsLog[i["wordIndex"]]["array"].append(i["count"])
-
-            for i in log.keys():
-                log[i].sort()
-
-            for i in log.keys():
-                for j in range(len(log[i])):
-                    if wordsLog[log[i][j]]["index"] == 0:
-                        wordsLog[log[i][j]]["streak"] = 1
-                        value = 0
-
-                    else:
-                        if wordsLog[log[i][j]]["array"][wordsLog[log[i][j]]["index"]] - wordsLog[log[i][j]]["array"][wordsLog[log[i][j]]["index"]-1] > 1:
-                            value = wordsLog[log[i][j]]["streak"]
-                            wordsLog[log[i][j]]["streak"] = 0
-
-                        else:
-                            value = wordsLog[log[i][j]]["streak"]
-                            wordsLog[log[i][j]]["streak"] += 1
-
-                    wordsLog[log[i][j]]["index"] += 1
-                    log[i][j] = value
-
-            days = [int(i) for i in log.keys()]
-            firstDay = min(days)*-1
-            toShow = []
-
-            for i in range(firstDay+1):
-                toShow.append([0, 0, 0, 0, 0, 0])
-
-            for i in days:
-                for j in log[str(i)]:
-                    if j > 4:
-                        toShow[i+firstDay][5] += 1
-
-                    else:
-                        toShow[i+firstDay][j] += 1
-
-            fig, ax = plt.subplots()
-            tickNumber = int(len(days)/10)
-            ticks = []
-
-            if not tickNumber:
-                tickNumber = 1
-
-            for i in days:
-                if int(i) % tickNumber == 0:
-                    ticks.append(i)
-
+                if i["currentStreak"] < 6:
+                    wordsLog[days.index(day)][i["currentStreak"]-1] += 1
+                
                 else:
-                    ticks.append("")
+                    wordsLog[days.index(day)][5] += 1
 
-            if len(toShow) > len(days):
-                toShow.pop()
+            if len(wordsLog) != len(days):
+                wordsLog.append([0,0,0,0,0,0])
 
-            ax.bar(days, [i[0] for i in toShow], label="0")
-            ax.bar(days, [i[1] for i in toShow], label="1",
-                   bottom=[i[0] for i in toShow])
-            ax.bar(days, [i[2] for i in toShow], label="2",
-                   bottom=[i[0]+i[1] for i in toShow])
-            ax.bar(days, [i[3] for i in toShow], label="3",
-                   bottom=[i[0]+i[1]+i[2] for i in toShow])
-            ax.bar(days, [i[4] for i in toShow], label="4",
-                   bottom=[i[0]+i[1]+i[2]+i[3] for i in toShow])
-            ax.bar(days, [i[5] for i in toShow], label=">4", bottom=[
-                   i[0]+i[1]+i[2]+i[3]+i[4] for i in toShow])
-
-            ax.legend()
+            ax.bar(days, [i[0] for i in wordsLog], label="0")
+            ax.bar(days, [i[1] for i in wordsLog], label="1", bottom=[i[0] for i in wordsLog])
+            ax.bar(days, [i[2] for i in wordsLog], label="2", bottom=[i[0]+i[1] for i in wordsLog])
+            ax.bar(days, [i[3] for i in wordsLog], label="3", bottom=[i[0]+i[1]+i[2] for i in wordsLog])
+            ax.bar(days, [i[4] for i in wordsLog], label="4", bottom=[i[0]+i[1]+i[2]+i[3] for i in wordsLog])
+            ax.bar(days, [i[5] for i in wordsLog], label="5+", bottom=[i[0]+i[1]+i[2]+i[3]+i[4] for i in wordsLog], tick_label=ticks)
 
         elif answer == "3":
-            log = {}
-            wordsLog = {}
-            d0 = (int(time.time())+SECONDS_DIFFERENCE)//(3600*24)
+            dayLogs = [{} for i in range(d0-firstDay+1)]
 
             for i in logs:
-                day = str(int((i["time"]+SECONDS_DIFFERENCE)//(3600*24)-d0))
+                if i["count"] == 1 or i["correct"] == 0:
+                    continue
+                    
+                day = str(int((i["time"]+i["localTime"])//(3600*24)-d0))
+                dayStreak = 0
 
-                if day not in log.keys():
-                    log[day] = []
+                if days.index(day) != 0:
+                    if i["wordIndex"] in dayLogs[days.index(day)-1]:
+                        dayStreak = dayLogs[days.index(day)-1][i["wordIndex"]] + 1
 
-                if i["correct"] == 1 and i["count"] > 1:
-                    log[day].append(i["wordIndex"])
+                dayLogs[days.index(day)][i["wordIndex"]] = dayStreak
+            
+            toDisplay = [[0,0,0,0,0,0] for i in range(d0-firstDay+1)]
 
-            for i in log.keys():
-                log[i].sort()
-
-            for i in log.keys():
-                for j in log[i]:
-                    if j not in wordsLog:
-                        wordsLog[j] = []
-
-                    wordsLog[j].append(int(i))
-
-            days = [int(i) for i in log.keys()]
-            previous = {}
-
-            for i in days:
-                previous[str(i)] = []
-
-            for i in wordsLog.keys():
-                count = 0
-                for j in range(len(wordsLog[i])):
-                    if j != 0:
-                        if wordsLog[i][j-1]+1 == wordsLog[i][j]:
-                            count += 1
-
-                        else:
-                            count = 0
-
-                    previous[str(wordsLog[i][j])].append(count)
-
-            firstDay = min(days)*-1
-            toShow = []
-
-            for i in range(firstDay+1):
-                toShow.append([0, 0, 0, 0, 0, 0])
-
-            for i in days:
-                for j in previous[str(i)]:
-                    if j > 4:
-                        toShow[i+firstDay][5] += 1
-
-                    else:
-                        toShow[i+firstDay][j] += 1
-
-            fig, ax = plt.subplots()
-            tickNumber = int(len(days)/10)
-            ticks = []
-
-            if not tickNumber:
-                tickNumber = 1
-
-            for i in days:
-                if int(i) % tickNumber == 0:
-                    ticks.append(i)
-
-                else:
-                    ticks.append("")
-
-            if len(toShow) > len(days):
-                toShow.pop()
-
-            ax.bar(days, [i[0] for i in toShow], label="0")
-            ax.bar(days, [i[1] for i in toShow], label="1",
-                   bottom=[i[0] for i in toShow])
-            ax.bar(days, [i[2] for i in toShow], label="2",
-                   bottom=[i[0]+i[1] for i in toShow])
-            ax.bar(days, [i[3] for i in toShow], label="3",
-                   bottom=[i[0]+i[1]+i[2] for i in toShow])
-            ax.bar(days, [i[4] for i in toShow], label="4",
-                   bottom=[i[0]+i[1]+i[2]+i[3] for i in toShow])
-            ax.bar(days, [i[5] for i in toShow], label=">4", bottom=[
-                   i[0]+i[1]+i[2]+i[3]+i[4] for i in toShow])
-
-            ax.legend()
-
+            for i in range(len(dayLogs)):
+                for j in dayLogs[i]:
+                    toDisplay[i][min(dayLogs[i][j], 5)] += 1
+            
+            ax.bar(days, [i[0] for i in toDisplay], label="0")
+            ax.bar(days, [i[1] for i in toDisplay], label="1", bottom=[i[0] for i in toDisplay])
+            ax.bar(days, [i[2] for i in toDisplay], label="2", bottom=[i[0]+i[1] for i in toDisplay])
+            ax.bar(days, [i[3] for i in toDisplay], label="3", bottom=[i[0]+i[1]+i[2] for i in toDisplay])
+            ax.bar(days, [i[4] for i in toDisplay], label="4", bottom=[i[0]+i[1]+i[2]+i[3] for i in toDisplay])
+            ax.bar(days, [i[5] for i in toDisplay], label="5+", bottom=[i[0]+i[1]+i[2]+i[3]+i[4] for i in toDisplay], tick_label=ticks)          
+                
         elif answer == "4":
-            log = {}
-            d0 = (logs[0]["time"]+SECONDS_DIFFERENCE)//(3600*24)
-
+            wordsLog = [[0, 0] for i in days]
             for i in logs:
-                day = str(int((i["time"]+SECONDS_DIFFERENCE)//(3600*24)-d0))
+                if i["count"] == 1:
+                    continue
+                
+                day = str(int((i["time"]+i["localTime"])//(3600*24)-d0))
+                
+                if i["correct"] == 1:
+                    wordsLog[days.index(day)][0] += 1
+                wordsLog[days.index(day)][1] += 1
 
-                if day not in log.keys():
-                    log[day] = []
+            accuracyDaily = [i[0]/i[1] for i in wordsLog]
+            average3 = [sum(accuracyDaily[max(0, i-2):i+1])/min(i+1, 3) for i in range(len(accuracyDaily))]
+            average7 = [sum(accuracyDaily[max(0, i-6):i+1])/min(i+1, 7) for i in range(len(accuracyDaily))]
 
-                log[day].append(i["correct"])
-
-            days = []
-            toShow = []
-
-            for i in log.keys():
-                days.append(int(i))
-                toShow.append(log[i].count(
-                    1)/(log[i].count(1)+log[i].count(0)))
-
-            for i in range(max(days)):
-                if i not in days:
-                    days.append(i)
-                    toShow.append(0)
-
-            toShow = [x for _, x in sorted(zip(days, toShow))]
-            days.sort()
-            tickNumber = int(len(days)/5)
-            ticks = []
-
-            if not tickNumber:
-                tickNumber = 1
-
-            for i in days:
-                if i % tickNumber == 0:
-                    ticks.append(i)
-
-                else:
-                    ticks.append("")
-
-            avg7 = []
-            avg3 = []
-
-            for i in range(len(toShow)):
-                avg3.append(sum(toShow[max(0, i-2):i+1])/min(i+1, 3))
-                avg7.append(sum(toShow[max(0, i-6):i+1])/min(i+1, 7))
-
-            fig, ax = plt.subplots()
-
-            ax.plot(days, avg3, label="3 day average", color='red')
-            ax.plot(days, avg7, label="7 day average", color='green')
-            ax.bar(days, toShow, tick_label=ticks, label="accuracy daily")
-
-            ax.legend()
+            ax.plot(days, average3, label="3 day average", color='red')
+            ax.plot(days, average7, label="7 day average", color='black')
+            ax.bar(days, accuracyDaily, tick_label=ticks, label="accuracy daily")
 
         elif answer == "5":
             log = {}
@@ -797,39 +623,57 @@ def showLogs(words, logs):
                 else:
                     hrsToShow.append("")
 
-            fig, ax = plt.subplots()
             plt.xticks(rotation=90)
 
             ax.bar(hrs, toShow, label="accuracy hourly", tick_label=hrsToShow)
 
-            ax.legend()
 
         elif answer == "6":
             toShow = ["1", "2", "3", "4", "5+"]
             toShowData = [0, 0, 0, 0, 0]
 
             for i in words:
-                if i["n"] == 1:
-                    toShowData[0] += 1
+                if i["n"] == 0:
+                    continue
 
-                elif i["n"] == 2:
-                    toShowData[1] += 1
-
-                elif i["n"] == 3:
-                    toShowData[2] += 1
-
-                elif i["n"] == 4:
-                    toShowData[3] += 1
-
-                elif i["n"] > 4:
-                    toShowData[4] += 1
-
-            fig, ax = plt.subplots()
+                toShowData[min(i["n"]-1, 4)] += 1
 
             for i in range(len(toShow)):
-                ax.bar(toShow[i], toShowData[i])
+                ax.bar(toShow[i], toShowData[i], label="")
 
         elif answer == "7":
+            toDisplay = [[0,0,0,0,0] for i in days]
+
+            wordsLog = {}
+            
+            for i in logs:
+                if i["count"] == 1 or i["correct"] == 0:
+                    continue
+
+                day = str(int((i["time"]+i["localTime"])//(3600*24)-d0))
+
+                if i["wordIndex"] not in wordsLog:
+                    wordsLog[i["wordIndex"]] = []
+
+                wordsLog[i["wordIndex"]].append([day, i["currentStreak"]])
+
+            for wordIndex in wordsLog:
+                for newTableIndex in range(len(wordsLog[wordIndex])):
+                    if newTableIndex + 1 < len(wordsLog[wordIndex]):
+                        for i in range(days.index(wordsLog[wordIndex][newTableIndex][0]), days.index(wordsLog[wordIndex][newTableIndex+1][0])):
+                            toDisplay[i][min(wordsLog[wordIndex][newTableIndex][1]-1, 4)] += 1
+                    
+                    else:
+                        for i in range(days.index(wordsLog[wordIndex][newTableIndex][0]), len(days)):
+                            toDisplay[i][min(wordsLog[wordIndex][newTableIndex][1]-1, 4)] += 1
+
+            ax.bar(days, [i[0] for i in toDisplay], label="1")
+            ax.bar(days, [i[1] for i in toDisplay], label="2", bottom = [i[0] for i in toDisplay])
+            ax.bar(days, [i[2] for i in toDisplay], label="3", bottom = [i[0]+i[1] for i in toDisplay])
+            ax.bar(days, [i[3] for i in toDisplay], label="4", bottom = [i[0]+i[1]+i[2] for i in toDisplay])
+            ax.bar(days, [i[4] for i in toDisplay], label="5+", bottom = [i[0]+i[1]+i[2]+i[3] for i in toDisplay], tick_label=ticks)
+
+        elif answer == "8":
             allEf = []
 
             for i in words:
@@ -849,11 +693,11 @@ def showLogs(words, logs):
             for i in allEf:
                 toShowData[toShow.index(i)] += 1
 
-            fig, ax = plt.subplots()
-
             ax.bar([str(i) for i in toShow], toShowData)
 
-        plt.show()
+        if answer in [str(i) for i in range(1, 9)]:
+            ax.legend()
+            plt.show()
 
 
 def main():
@@ -890,9 +734,9 @@ def main():
         settings = data["settings"]
         logs = data["logs"]
 
-    today = time.localtime()
+    today = time.localtime()[0:3]
 
-    if today.tm_mday != settings["date"][2] or today.tm_mon != settings["date"][1]:
+    if today[0]*365+today[1]*30+today[2] > settings["date"][0]*365+settings["date"][1]*30+settings["date"][2]:
         settings["date"] = today
         settings["words"] = 0
 
