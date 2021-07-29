@@ -236,6 +236,10 @@ def repeat(words, settings, logs):
 
     notCorrect = []
 
+    if settings["repeatAll"] == 1:
+        if toRepeatToday:
+            toRepeat = toRepeat + toRepeatToday
+
     if not toRepeat:
         firstWordTime = words[0]["date"]
 
@@ -303,7 +307,7 @@ def repeat(words, settings, logs):
                 "ease": words[currentIndex]["ef"],
                 "timeSpent": round(afterWordTime-beforeWordTime, 1),
                 "localTime": SECONDS_DIFFERENCE,
-                "currentStreak": words[currentIndex]["currentStreak"]
+                "currentStreak": words[currentIndex]["n"]
             })
 
             toRepeat.remove(currentIndex)
@@ -400,7 +404,7 @@ def repeat(words, settings, logs):
                     "ease": words[currentIndex]["ef"],
                     "timeSpent": round(afterWordTime-beforeWordTime, 1),
                     "localTime": SECONDS_DIFFERENCE,
-                    "currentStreak": words[currentIndex]["currentStreak"]
+                    "currentStreak": words[currentIndex]["n"]
                 })
 
             else:
@@ -580,9 +584,13 @@ def showLogs(words, logs):
                     wordsLog[days.index(day)][0] += 1
                 wordsLog[days.index(day)][1] += 1
 
-            accuracyDaily = [i[0]/i[1] for i in wordsLog]
+            accuracyDaily = [i[0]/i[1] if i[1] > 0 else 0 for i in wordsLog]
             average3 = [sum(accuracyDaily[max(0, i-2):i+1])/min(i+1, 3) for i in range(len(accuracyDaily))]
             average7 = [sum(accuracyDaily[max(0, i-6):i+1])/min(i+1, 7) for i in range(len(accuracyDaily))]
+
+            if accuracyDaily[-1] == 0:
+                average3[-1] = None
+                average7[-1] = None
 
             ax.plot(days, average3, label="3 day average", color='red')
             ax.plot(days, average7, label="7 day average", color='black')
@@ -639,7 +647,7 @@ def showLogs(words, logs):
                 toShowData[min(i["n"]-1, 4)] += 1
 
             for i in range(len(toShow)):
-                ax.bar(toShow[i], toShowData[i], label="")
+                ax.bar(toShow[i], toShowData[i])
 
         elif answer == "7":
             toDisplay = [[0,0,0,0,0] for i in days]
@@ -696,7 +704,9 @@ def showLogs(words, logs):
             ax.bar([str(i) for i in toShow], toShowData)
 
         if answer in [str(i) for i in range(1, 9)]:
-            ax.legend()
+            if answer not in ["6", "8"]:
+                ax.legend()
+            
             plt.show()
 
 
