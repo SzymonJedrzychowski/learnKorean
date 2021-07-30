@@ -226,12 +226,20 @@ def repeat(words, settings, logs):
 
     currentTime = time.time()
     toEnd = currentTime+SECONDS_DIFFERENCE+3600*(24-((currentTime+SECONDS_DIFFERENCE)/3600) % 24)
+    
+    allWordsLastDifference = {}
+
+    for i in logs:
+        allWordsLastDifference[i["wordIndex"]] = i["localTime"]
 
     for i in range(len(words)):
-        if words[i]["date"] < currentTime and words[i]["date"] != 0:
+        if i not in allWordsLastDifference:
+            continue 
+
+        if words[i]["date"]+allWordsLastDifference[i] < currentTime and words[i]["date"] != 0:
             toRepeat.append(i)
 
-        elif words[i]["date"] > currentTime and words[i]["date"] < toEnd:
+        elif words[i]["date"]+allWordsLastDifference[i] > currentTime and words[i]["date"]+allWordsLastDifference[i] < toEnd:
             toRepeatToday.append(i)
 
     notCorrect = []
