@@ -481,7 +481,7 @@ def showLogs(words, logs):
             lastDay = max([words[i]["date"]+allWordsLastDifference[i] for i in range(len(allWordsLastDifference))])//(3600*24)
 
             if answer == "1":
-                days = [str(i-d0) for i in range(firstDay, lastDay+1)]
+                days = [str(i-d0) for i in range(firstDay, int(lastDay+1))]
             
             else:
                 days = [str(i-d0) for i in range(firstDay, d0+1)]
