@@ -30,12 +30,13 @@ def load(lastFileTime):
     service = build('drive', 'v3', credentials=creds)
     
     results = service.files().list(
-        pageSize=1, fields="nextPageToken, files(id, name, description)").execute()
+        pageSize=10, fields="nextPageToken, files(id, name, description)").execute()
     items = results.get('files', [])
 
     thisFileTime = 0
     for item in items:
-        thisFileTime = int(item["description"])
+        if item["name"] == "data.json":
+            thisFileTime = int(item["description"])
 
     if thisFileTime<lastFileTime:
         return False
