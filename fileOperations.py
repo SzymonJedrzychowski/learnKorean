@@ -28,15 +28,8 @@ def load(lastFileTime):
             token.write(creds.to_json())
 
     service = build('drive', 'v3', credentials=creds)
-    
-    results = service.files().list(
-        pageSize=10, fields="nextPageToken, files(id, name, description)").execute()
-    items = results.get('files', [])
 
-    thisFileTime = 0
-    for item in items:
-        if item["name"] == "data.json":
-            thisFileTime = int(item["description"])
+    thisFileTime = int(service.files().get(fileId='1-XFgSplPR3imq2DfH_opeaxpmM4W-ct7', fields="description").execute()["description"])
 
     if thisFileTime<lastFileTime:
         return False
