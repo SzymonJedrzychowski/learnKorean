@@ -472,6 +472,9 @@ def showLogs(words, logs):
         if len(answer.split(" ")) == 2:
             limits = answer.split(" ")[1]
             answer = answer.split(" ")[0]
+            if limits.count(":") != 1:
+                incorrectLimits = True
+                continue
 
         if answer == "0":
             break
