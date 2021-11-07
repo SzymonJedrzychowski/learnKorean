@@ -10,7 +10,6 @@ from fileOperations import *
 global SECONDS_DIFFERENCE
 SECONDS_DIFFERENCE = time.localtime().tm_gmtoff
 
-
 def clear():
     """Clear the whole terminal display."""
 
@@ -280,7 +279,7 @@ def repeat(words, settings, logs):
         currentWord = words[currentIndex]
 
         print("Words to repeat: {}\n".format(len(notCorrect+toRepeat)))
-        print("===\n (0. to exit)\n")
+        print("===\n(0. to exit)\n")
         print("Word: {}\n".format(currentWord["eng"]))
 
         answer = input("Translation: ")
@@ -436,7 +435,7 @@ def repeat(words, settings, logs):
             return words, settings, logs
 
 
-def showLogs(words, logs):
+def showLogs(words, logs, logsSave):
     incorrectLimits = False
     while True:
         clear()
@@ -445,7 +444,6 @@ def showLogs(words, logs):
         allWordsLastDifference = {}
 
         for i in logs:
-            day = str(int((i["time"]+i["localTime"])//(3600*24)-d0))
             allWordsLastDifference[i["wordIndex"]] = i["localTime"]
         
         firstDay = (logs[0]["time"]+logs[0]["localTime"])//(3600*24)
@@ -527,23 +525,14 @@ def showLogs(words, logs):
                     ticks.append("")
 
         if answer == "1":
-            wordsLog = [[0,0,0] for i in days]
+            wordsLog = []
 
-            for i in logs:
-                if i["correct"] == 0:
-                    continue
-
-                day = str(int((i["time"]+i["localTime"])//(3600*24)-d0))
-
-                if day not in days:
-                    continue
-
-                if i["count"] == 1:
-                    wordsLog[days.index(day)][0] += 1
-                
+            for i in days:
+                if str(int(i)-(firstDay-d0)) in logsSave.keys():
+                    wordsLog.append(logsSave[str(int(i)-(firstDay-d0))]["1"]+[0])
                 else:
-                    wordsLog[days.index(day)][1] += 1
-
+                    wordsLog.append([0,0,0])
+    
             for j, i in enumerate(words):
                 try:
                     day = str(int((i["date"]+allWordsLastDifference[j])//(3600*24)-d0))
@@ -557,24 +546,10 @@ def showLogs(words, logs):
             ax.bar(days, [i[2] for i in wordsLog], label="words to repeat", bottom=[i[0]+i[1] for i in wordsLog], tick_label=ticks)
                 
         elif answer == "2":
-            wordsLog = [[0,0,0,0,0,0] for i in range(len(days))]
+            wordsLog = []
 
-            for i in logs:
-                if i["count"] == 1 or i["correct"] == 0:
-                    continue
-
-                day = str(int((i["time"]+i["localTime"])//(3600*24)-d0))
-                if day not in days:
-                    continue
-
-                if i["currentStreak"] < 6:
-                    wordsLog[days.index(day)][i["currentStreak"]-1] += 1
-                
-                else:
-                    wordsLog[days.index(day)][5] += 1
-
-            if len(wordsLog) != len(days):
-                wordsLog.append([0,0,0,0,0,0])
+            for i in days:
+                wordsLog.append(logsSave[str(int(i)-(firstDay-d0))]["2"])
 
             ax.bar(days, [i[0] for i in wordsLog], label="0")
             ax.bar(days, [i[1] for i in wordsLog], label="1", bottom=[i[0] for i in wordsLog])
@@ -584,36 +559,10 @@ def showLogs(words, logs):
             ax.bar(days, [i[5] for i in wordsLog], label="5+", bottom=[i[0]+i[1]+i[2]+i[3]+i[4] for i in wordsLog], tick_label=ticks)
 
         elif answer == "3":
-            dayLogs = [{} for i in range(d0-firstDay+1)]
-            allDaysList = [str(-i) for i in range(0, d0-firstDay+1)]
-            allDaysList.reverse()
-            
-            for i in logs:
-                if i["count"] == 1 or i["correct"] == 0:
-                    continue
-                    
-                day = str(int((i["time"]+i["localTime"])//(3600*24)-d0))
-                dayStreak = 0
-
-                if allDaysList.index(day) != 0:
-                    if i["wordIndex"] in dayLogs[allDaysList.index(day)-1]:
-                        dayStreak = dayLogs[allDaysList.index(day)-1][i["wordIndex"]] + 1
-
-                dayLogs[allDaysList.index(day)][i["wordIndex"]] = dayStreak
-            
-            allDays = [[0,0,0,0,0,0] for i in range(d0-firstDay+1)]
-
-            for i in range(len(dayLogs)):
-                for j in dayLogs[i]:
-                    allDays[i][min(dayLogs[i][j], 5)] += 1
-
             toDisplay = []
-
-            for i in range(len(allDays)):
-                if str(i-(d0-firstDay)) in days:
-                    toDisplay.append(allDays[i])
-
             
+            for i in days:
+                toDisplay.append(logsSave[str(int(i)-(firstDay-d0))]["3"])
             
             ax.bar(days, [i[0] for i in toDisplay], label="0")
             ax.bar(days, [i[1] for i in toDisplay], label="1", bottom=[i[0] for i in toDisplay])
@@ -631,18 +580,9 @@ def showLogs(words, logs):
                 toDelete = firstDay-d0-int(days[0])
                 days = [str(i) for i in range(int(days[0]), int(days[0]))]+days
 
-            wordsLog = [[0, 0] for i in days]
-            for i in logs:
-                if i["count"] == 1:
-                    continue
-                
-                day = str(int((i["time"]+i["localTime"])//(3600*24)-d0))
-                if day not in days:
-                    continue
-                
-                if i["correct"] == 1:
-                    wordsLog[days.index(day)][0] += 1
-                wordsLog[days.index(day)][1] += 1
+            wordsLog = []
+            for i in days:
+                wordsLog.append(logsSave[str(int(i)-(firstDay-d0))]["4"])
 
             accuracyDaily = [i[0]/i[1] if i[1] > 0 else 0 for i in wordsLog]
             average3 = [sum(accuracyDaily[max(0, i-2):i+1])/min(i+1, 3) for i in range(len(accuracyDaily))]
@@ -663,31 +603,21 @@ def showLogs(words, logs):
             ax.bar(days, accuracyDaily, tick_label=ticks, label="accuracy daily")
 
         elif answer == "5":
-            log = {}
-
-            for i in range(96):
-                log[i] = []
-
-            for i in logs:
-                log[(i["time"]+SECONDS_DIFFERENCE) %
-                    (3600*24)//900].append(i["correct"])
-
             toShow = []
+            for i in range(96):
+                if logsSave["hours"][i][1] > 0:
+                    toShow.append(logsSave["hours"][i][0]/logsSave["hours"][i][1])
+                else:
+                    toShow.append(0)
+
             hrs = []
 
-            for i in log.keys():
+            for i in range(96):
                 if i % 4 == 0:
                     hrs.append("{}:00".format(i//4))
 
                 else:
                     hrs.append("{}:{}".format(i//4, 15*(i % 4)))
-
-                if len(log[i]) > 0:
-                    toShow.append(log[i].count(
-                        1)/(log[i].count(0)+log[i].count(1)))
-
-                else:
-                    toShow.append(0)
 
             hrsToShow = []
 
@@ -715,37 +645,13 @@ def showLogs(words, logs):
                 ax.bar(toShow[i], toShowData[i])
 
         elif answer == "7":
-            allDaysList = [str(-i) for i in range(0, d0-firstDay+1)]
-            allDaysList.reverse()
-            allDays = [[0,0,0,0,0] for i in range(0, d0-firstDay+1)]
             toDisplay = []
+            if sum(logsSave[str(int(days[-1])-(firstDay-d0))]["7"]) == 0:
+                for i in words:
+                    logsSave[str(int(days[-1])-(firstDay-d0))]["7"][min(i["n"], 5)-1] += 1
 
-            wordsLog = {}
-            
-            for i in logs:
-                if i["count"] == 1 or i["correct"] == 0:
-                    continue
-
-                day = str(int((i["time"]+i["localTime"])//(3600*24)-d0))
-
-                if i["wordIndex"] not in wordsLog:
-                    wordsLog[i["wordIndex"]] = []
-
-                wordsLog[i["wordIndex"]].append([day, i["currentStreak"]])
-
-            for wordIndex in wordsLog:
-                for newTableIndex in range(len(wordsLog[wordIndex])):
-                    if newTableIndex + 1 < len(wordsLog[wordIndex]):
-                        for i in range(allDaysList.index(wordsLog[wordIndex][newTableIndex][0]), allDaysList.index(wordsLog[wordIndex][newTableIndex+1][0])):
-                            allDays[i][min(wordsLog[wordIndex][newTableIndex][1]-1, 4)] += 1
-                    
-                    else:
-                        for i in range(allDaysList.index(wordsLog[wordIndex][newTableIndex][0]), len(allDaysList)):
-                            allDays[i][min(wordsLog[wordIndex][newTableIndex][1]-1, 4)] += 1
-
-            for i in range(len(allDaysList)):
-                if allDaysList[i] in days:
-                    toDisplay.append(allDays[i])
+            for i in days:
+                toDisplay.append(logsSave[str(int(i)-(firstDay-d0))]["7"])
 
             ax.bar(days, [i[0] for i in toDisplay], label="1")
             ax.bar(days, [i[1] for i in toDisplay], label="2", bottom = [i[0] for i in toDisplay])
@@ -780,6 +686,80 @@ def showLogs(words, logs):
                 ax.legend()
             
             plt.show()
+
+
+def saveLogs(logs, logStart, logsSave, words):
+    d0 = (int(time.time())+SECONDS_DIFFERENCE)//(3600*24)
+
+    firstDay = (logs[0]["time"]+logs[0]["localTime"])//(3600*24)
+    if str(d0-firstDay) not in logsSave:
+        logsSave[str(d0-firstDay)] = {"1": [0,0], "2": [0,0,0,0,0,0], "3": [0,0,0,0,0,0], "4": [0, 0], "7": [0,0,0,0,0]}
+
+    for i in logs[logStart:]:
+        day = d0-firstDay
+        #FOR 1
+        if i["correct"] != 0:
+            if i["count"] == 1:
+                logsSave[day]["1"][0] += 1     
+            else:
+                logsSave[day]["1"][1] += 1
+
+        #FOR 2
+        if i["count"] != 1 and i["correct"] != 0:
+            if i["currentStreak"] < 6:
+                logsSave[day]["2"][i["currentStreak"]-1] += 1
+            else:
+                logsSave[day]["2"][5] += 1
+
+        #FOR 4
+        if i["count"] != 1:
+            if i["correct"] == 1:
+                logsSave[day]["4"][0] += 1
+            logsSave[day]["4"][1] += 1
+
+        #FOR HOURS
+        if i["count"] != 1:
+            if i["correct"] == 1:
+                logsSave["hours"][(i["time"]+SECONDS_DIFFERENCE) %
+                        (3600*24)//900][0] += 1
+            logsSave["hours"][(i["time"]+SECONDS_DIFFERENCE) %
+                        (3600*24)//900][1] += 1
+    
+    #FOR 7
+    logsSave[day]["7"] = [0,0,0,0,0]
+    for i in words:
+        if i["n"] != 0:
+            logsSave[day]["7"][min(i["n"], 5)-1] += 1
+    
+    #FOR 3
+    todayWords = {}
+    finalTodayWords = {}
+    toRemove = []
+    for j, i in enumerate(reversed(logs)):
+        wordDay = (i["time"]+SECONDS_DIFFERENCE)//(3600*24)
+        if i["correct"] == 0 or i["count"] == 1:
+            continue
+        if wordDay == d0:
+            if i["wordIndex"] not in todayWords:
+                todayWords[i["wordIndex"]] = [wordDay]
+        elif i["wordIndex"] in todayWords:
+            if todayWords[i["wordIndex"]][-1] == wordDay+1:
+                todayWords[i["wordIndex"]].append(wordDay)
+            else:
+                finalTodayWords[i["wordIndex"]] = todayWords[i["wordIndex"]]
+                toRemove = [i["wordIndex"]]
+        for l in toRemove:
+            del todayWords[l]
+            toRemove = []
+        if not todayWords and wordDay != d0:
+            break
+    
+    allDays = [0,0,0,0,0,0]
+    for i in finalTodayWords:
+        allDays[min(len(finalTodayWords[i])-1, 5)] += 1
+    logsSave[day]["3"] = allDays
+    
+    return logsSave
 
 
 def main():
@@ -819,6 +799,7 @@ def main():
         words = data["words"]
         settings = data["settings"]
         logs = data["logs"]
+        logsSave = data["logsSave"]
         logsLength = len(logs)
 
     today = time.localtime()[0:3]
@@ -842,13 +823,17 @@ def main():
             break
         
         elif dec == "1":
+            logsLen = len(logs)
             words, settings, logs = learnNewWords(words, settings, logs)
+            logsSave = saveLogs(logs, logsLen, logsSave, words)
 
         elif dec == "2":
+            logsLen = len(logs)
             words, settings, logs = repeat(words, settings, logs)
+            logsSave = saveLogs(logs, logsLen, logsSave, words)
 
         elif dec == "3":
-            showLogs(words, logs)
+            showLogs(words, logs, logsSave)
 
     settings["time"] = int(time.time())
     if len(logs) > logsLength:
@@ -856,6 +841,7 @@ def main():
             data["words"] = words
             data["settings"] = settings
             data["logs"] = logs
+            data["logsSave"] = data["logsSave"]
             json.dump(data, sv)
 
         save(settings["time"])
