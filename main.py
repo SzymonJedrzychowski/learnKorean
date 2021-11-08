@@ -5,6 +5,7 @@ from os import system, name
 import matplotlib.pyplot as plt
 from playsound import playsound
 from fileOperations import *
+import sys
 
 # All data is saved with UTC time, difference must be calculated to make the program work correctly in different time-zones.
 global SECONDS_DIFFERENCE
@@ -459,70 +460,76 @@ def showLogs(words, logs, logsSave):
         print("7. Word types history")
         print("8. Ease factor")
 
-        print("\nLimits: {}:{} <- only for 1.".format(firstDay-d0, lastDay-d0))
-        if incorrectLimits:
-            incorrectLimits = False
-            print("\nIncorrect limits. Try again.\n")
+        print("\nLimits: {}:{} <- only for 1.".format(firstDay-d0, int(lastDay-d0)))
 
-        answer = input()
-        limits = []
+        try:
+            answer = input()
+            limits = []
 
-        if len(answer.split(" ")) == 2:
-            limits = answer.split(" ")[1]
-            answer = answer.split(" ")[0]
-            if limits.count(":") != 1:
-                incorrectLimits = True
-                continue
+            if len(answer.split(" ")) == 2:
+                limits = answer.split(" ")[1]
+                answer = answer.split(" ")[0]
+                if limits.count(":") != 1:
+                    incorrectLimits = True
+                    continue
 
-        if answer == "0":
-            break
+            if answer == "0":
+                break
+
+            if answer in ["1", "2", "3", "4", "7"]:
+
+                if limits:
+                    if limits[0] == ":":
+                        limits = [str(firstDay-d0), limits.split(":")[1]]
+                    elif limits.split(":")[1] == "":
+                        limits = [limits.split(":")[0], 0]
+                    else:
+                        limits = limits.split(":")
+                else:
+                    limits = [str(firstDay-d0), 0]
+
+                if answer == "1":
+                    days = [str(i-d0) for i in range(firstDay, int(lastDay+1))]
+                    if limits[1] == 0:
+                        limits[1] = str(int(lastDay-d0))
+
+                else:
+                    days = [str(i-d0) for i in range(firstDay, d0+1)]
+                    if limits[1] == 0:
+                        limits[1] = "0"
+
+                if int(limits[0])>=int(limits[1]):
+                    print("There was a problem with limits.")
+                    _ = input()
+                    continue
+                elif limits[0] in days and limits[1] in days:
+                    days = [str(i) for i in range(int(limits[0]), int(limits[1])+1)]
+                else:
+                    print("There was a problem with limits.")
+                    _ = input()
+                    continue
+
+                
+                tickNumber = int(len(days)/10)
+                ticks = []
+
+                if not tickNumber:
+                    tickNumber = 1
+
+                for i in days:
+                    if int(i) % tickNumber == 0:
+                        ticks.append(i)
+
+                    else:
+                        ticks.append("")
+
+        except:
+            print("There was a problem with your input.")
+            _ = input()
+            continue
 
         if answer in [str(i) for i in range(1, 9)]:
             fig, ax = plt.subplots()
-
-        if answer in ["1", "2", "3", "4", "7"]:
-
-            if limits:
-                if limits[0] == ":":
-                    limits = [str(firstDay-d0), limits.split(":")[1]]
-                elif limits.split(":")[1] == "":
-                    limits = [limits.split(":")[0], 0]
-                else:
-                    limits = limits.split(":")
-            else:
-                limits = [str(firstDay-d0), 0]
-
-            if answer == "1":
-                days = [str(i-d0) for i in range(firstDay, int(lastDay+1))]
-                if limits[1] == 0:
-                    limits[1] = str(lastDay-d0)
-
-            else:
-                days = [str(i-d0) for i in range(firstDay, d0+1)]
-                if limits[1] == 0:
-                    limits[1] = "0"
-
-            if int(limits[0])>=int(limits[1]):
-                incorrectLimits = True
-                continue
-            elif limits[0] in days and limits[1] in days:
-                days = [str(i) for i in range(int(limits[0]), int(limits[1])+1)]
-            else:
-                incorrectLimits = True
-                continue
-            
-            tickNumber = int(len(days)/10)
-            ticks = []
-
-            if not tickNumber:
-                tickNumber = 1
-
-            for i in days:
-                if int(i) % tickNumber == 0:
-                    ticks.append(i)
-
-                else:
-                    ticks.append("")
 
         if answer == "1":
             wordsLog = []
@@ -694,9 +701,9 @@ def saveLogs(logs, logStart, logsSave, words):
     firstDay = (logs[0]["time"]+logs[0]["localTime"])//(3600*24)
     if str(d0-firstDay) not in logsSave:
         logsSave[str(d0-firstDay)] = {"1": [0,0], "2": [0,0,0,0,0,0], "3": [0,0,0,0,0,0], "4": [0, 0], "7": [0,0,0,0,0]}
-
+    day = "-1"
     for i in logs[logStart:]:
-        day = d0-firstDay
+        day = str(d0-firstDay)
         #FOR 1
         if i["correct"] != 0:
             if i["count"] == 1:
@@ -725,6 +732,8 @@ def saveLogs(logs, logStart, logsSave, words):
             logsSave["hours"][(i["time"]+SECONDS_DIFFERENCE) %
                         (3600*24)//900][1] += 1
     
+    if day == "-1":
+        return logsSave
     #FOR 7
     logsSave[day]["7"] = [0,0,0,0,0]
     for i in words:
