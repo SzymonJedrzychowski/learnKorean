@@ -497,6 +497,8 @@ def showLogs(words, logs, logsSave):
                     days = [str(i-d0) for i in range(firstDay, d0+1)]
                     if limits[1] == 0:
                         limits[1] = "0"
+                    if str(int(days[-1])-(firstDay-d0)) not in logsSave:
+                        logsSave[str(int(days[-1])-(firstDay-d0))] = {'1': [0, 0], '2': [0,0,0,0,0,0], '3': [0,0,0,0,0,0], '4': [0,0], '7': logsSave[str(int(days[-1])-(firstDay-d0)-1)]["7"]}
 
                 if int(limits[0])>=int(limits[1]):
                     print("There was a problem with limits.")
