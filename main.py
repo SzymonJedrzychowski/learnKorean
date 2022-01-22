@@ -609,6 +609,7 @@ def showLogs(words, logs, logsSave):
 
             ax.plot(days, average3, label="3 day average", color='red')
             ax.plot(days, average7, label="7 day average", color='black')
+            ax.set_ylim([0, 1])
             ax.bar(days, accuracyDaily, tick_label=ticks, label="accuracy daily")
 
         elif answer == "5":
