@@ -5,6 +5,9 @@ from functools import partial
 
 class Ui_viewLogsScreen(object):
     """Screen to view logs"""
+
+    def __init__(self):
+        self.deliberateZero = False
     
     def setupUi(self, mainScreen, **kwargs):
         self.screenName = "viewLogsScreen"
@@ -194,7 +197,7 @@ class Ui_viewLogsScreen(object):
         if self.mainScreen.graphLimits != None:
             if self.mainScreen.graphLimits[0] != self.firstDay:
                 self.startLimit.setText(str(self.mainScreen.graphLimits[0]))
-            if self.mainScreen.graphLimits[1] != self.lastDay:
+            if self.mainScreen.graphLimits[1] != self.lastDay and (self.mainScreen.graphLimits[1] != 0 or (self.mainScreen.graphLimits[1] == 0 and self.deliberateZero == True)):
                 self.endLimit.setText(str(self.mainScreen.graphLimits[1]))
 
     def retranslateUi(self, mainScreen):
