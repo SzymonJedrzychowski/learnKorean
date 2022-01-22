@@ -125,6 +125,9 @@ class Ui_repeatWordsScreen(object):
         self.koreanWordLabel.clicked.connect(self.playCurrentWord)
         self.returnButton.clicked.connect(self.mainScreen.close)
 
+        # Get words to repeat
+        self.wordsToRepeat = self.getWordsToRepeat()
+
         self.retranslateUi(self.mainScreen)
         QtCore.QMetaObject.connectSlotsByName(self.mainScreen)
 
@@ -133,8 +136,7 @@ class Ui_repeatWordsScreen(object):
         self.correctButton.setShortcut("Ctrl+`")
         self.returnButton.setShortcut("Ctrl+Q")
 
-        # Get words to repeat and set the first word
-        self.wordsToRepeat = self.getWordsToRepeat()
+        # Set the first word
         self.setWord()
 
     def playCurrentWord(self):

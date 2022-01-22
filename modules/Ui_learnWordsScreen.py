@@ -125,6 +125,9 @@ class Ui_learnWordsScreen(object):
         self.koreanWordLabel.clicked.connect(self.playCurrentWord)
         self.returnButton.clicked.connect(mainScreen.close)
 
+        # Get words learned today
+        self.todayLearned = self.getTodayLearned()
+
         self.retranslateUi(mainScreen)
         QtCore.QMetaObject.connectSlotsByName(mainScreen)
 
@@ -134,7 +137,6 @@ class Ui_learnWordsScreen(object):
 
         # Run functions to get words and set first word to learn
         self.wordsToLearn = self.getWordsToLearn()
-        self.todayLearned = self.getTodayLearned()
         self.setWord()
 
     def playCurrentWord(self):

@@ -51,6 +51,11 @@ class Ui_removeWordsScreen(object):
         self.horizontalLayout_4.setObjectName("horizontalLayout_4")
 
         self.koreanWordLabel = QtWidgets.QLabel(self.centralwidget)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.MinimumExpanding)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.koreanWordLabel.sizePolicy().hasHeightForWidth())
+        self.koreanWordLabel.setSizePolicy(sizePolicy)
         font = QtGui.QFont()
         font.setPointSize(18)
         self.koreanWordLabel.setFont(font)
@@ -65,6 +70,11 @@ class Ui_removeWordsScreen(object):
         self.horizontalLayout_4.addItem(spacerItem)
 
         self.englishWordLabel = QtWidgets.QLabel(self.centralwidget)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.MinimumExpanding)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.englishWordLabel.sizePolicy().hasHeightForWidth())
+        self.englishWordLabel.setSizePolicy(sizePolicy)
         font = QtGui.QFont()
         font.setPointSize(18)
         self.englishWordLabel.setFont(font)
