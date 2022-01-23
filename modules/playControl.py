@@ -1,5 +1,6 @@
 from playsound import playsound
 
+
 class playControl:
     """Class used to control playing the sound"""
 
@@ -8,7 +9,7 @@ class playControl:
 
     def playSound(self, file: str):
         """Play sound
-        
+
         :param file: file location and name
         """
 

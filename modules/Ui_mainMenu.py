@@ -5,7 +5,7 @@ import clipboard
 
 class Ui_mainMenu(object):
     """Screen for main menu"""
-    
+
     def setupUi(self, mainScreen, **kwargs):
         self.screenName = "mainMenuScreen"
         self.mainScreen = mainScreen
@@ -109,7 +109,8 @@ class Ui_mainMenu(object):
             partial(self.mainScreen.useScreen, self.mainScreen.modifySetScreen))
         self.generateQuizletDataButton.clicked.connect(
             self.generateQuizletData)
-        self.saveButton.clicked.connect(partial(self.mainScreen.saveData, self.saveButton))
+        self.saveButton.clicked.connect(
+            partial(self.mainScreen.saveData, self.saveButton))
         self.quitButton.clicked.connect(
             partial(self.mainScreen.useScreen, self.mainScreen.quitScreen))
 

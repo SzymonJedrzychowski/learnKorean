@@ -7,7 +7,7 @@ from functools import partial
 
 class Ui_learnWordsScreen(object):
     """Screen to learn words"""
-    
+
     def setupUi(self, mainScreen, **kwargs):
         self.screenName = "learnWordsScreen"
         self.mainScreen = mainScreen

@@ -1,12 +1,13 @@
-from PyQt5 import QtCore, QtGui, QtWidgets
+import time
 import os
+from PyQt5 import QtCore, QtGui, QtWidgets
 from gtts import gTTS
 from functools import partial
 
 
 class Ui_addWordsScreen(object):
     """Screen to add words"""
-    
+
     def setupUi(self, mainScreen, **kwargs):
         self.screenName = "addWordsScreen"
         self.mainScreen = mainScreen
@@ -187,17 +188,23 @@ class Ui_addWordsScreen(object):
 
         koreanWord = self.koreanWord.text()
         englishWord = self.englishWord.text()
-        wordIndex = self.inputIndex.text()
+        wordIndex = int(self.inputIndex.text())
 
         # Prevent adding if any places is empty
-        if koreanWord == "" or englishWord == "" or wordIndex == "" or int(wordIndex) < self.limits[0] or int(wordIndex) > self.limits[1]:
+        if koreanWord == "" or englishWord == "" or wordIndex == "" or wordIndex < self.limits[0] or wordIndex > self.limits[1]:
             self.submitButton.setText("Error")
         else:
             # Create sound file if no file with such korean word is already in sounds directory
             if not os.path.isfile("data/sounds/{}.mp3".format(koreanWord)):
                 tts = gTTS(koreanWord, lang="ko")
-                tts.save("{}.mp3".format(koreanWord))
+                tts.save("data/sounds/{}.mp3".format(koreanWord))
+                print("[SOUND FILE: {}]     Created sound file: {}.mp3".format(
+                    time.strftime("%H:%M:%S"), koreanWord))
+            self.data["words"].insert(wordIndex, {
+                                      "han": koreanWord, "eng": englishWord, "n": 0, "ef": 2.5, "i": 0, "count": 0, "date": 0, "localTime": 0})
             self.submitButton.setText("Word added")
+            self.koreanWord.setText("")
+            self.englishWord.setText("")
         QtCore.QTimer.singleShot(3000, partial(
             self.mainScreen.changeButtonText, self.submitButton, "Submit"))
 

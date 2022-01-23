@@ -307,12 +307,12 @@ class Ui_graphScreen(object):
         :param graphLimits: list() of two string limits,
         :param allowFuture: bool if future values are allowed for the limits calculation
         """
-        
+
         if graphLimits[0] != "":
             graphLimits[0] = int(graphLimits[0])
         else:
             graphLimits[0] = self.firstDay-self.d0
-        
+
         self.mainScreen.viewLogsScreen.deliberateZero = False
         if graphLimits[1] != "":
             graphLimits[1] = int(graphLimits[1])

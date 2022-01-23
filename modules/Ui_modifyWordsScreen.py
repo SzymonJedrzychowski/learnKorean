@@ -1,18 +1,20 @@
+import os
+import time
+from hashlib import new
 from PyQt5 import QtCore, QtGui, QtWidgets
-from modules import playControl
-from modules import clickableLabel
-from modules.clickableLabel import QLabelClickable
+from functools import partial
+from gtts import gTTS
 
 
-class Ui_searchWordsScreen(object):
+class Ui_modifyWordsScreen(object):
     """Screen to search words"""
 
     def setupUi(self, mainScreen, **kwargs):
-        self.screenName = "searchWordsScreen"
+        self.screenName = "modifyWordsScreen"
         self.mainScreen = mainScreen
         self.data = mainScreen.data
 
-        self.soundplay = playControl.playControl()
+        self.item = None
 
         # Create layout for the screen: start
         mainScreen.setObjectName("mainScreen")
@@ -52,7 +54,7 @@ class Ui_searchWordsScreen(object):
         self.horizontalLayout_4 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_4.setObjectName("horizontalLayout_4")
 
-        self.koreanWordLabel = QLabelClickable(self.centralwidget)
+        self.koreanWordLabel = QtWidgets.QLabel(self.centralwidget)
         sizePolicy = QtWidgets.QSizePolicy(
             QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.MinimumExpanding)
         sizePolicy.setHorizontalStretch(0)
@@ -92,12 +94,29 @@ class Ui_searchWordsScreen(object):
 
         self.verticalLayout.addLayout(self.horizontalLayout_4)
 
+        self.horizontalLayout_2 = QtWidgets.QHBoxLayout()
+        self.horizontalLayout_2.setObjectName("horizontalLayout_2")
+
+        self.koreanWord = QtWidgets.QLineEdit(self.centralwidget)
+        self.koreanWord.setObjectName("koreanWord")
+        self.horizontalLayout_2.addWidget(self.koreanWord)
+
+        self.englishWord = QtWidgets.QLineEdit(self.centralwidget)
+        self.englishWord.setObjectName("englishWord")
+        self.horizontalLayout_2.addWidget(self.englishWord)
+
+        self.verticalLayout.addLayout(self.horizontalLayout_2)
+
         self.horizontalLayout = QtWidgets.QHBoxLayout()
         self.horizontalLayout.setObjectName("horizontalLayout")
 
         self.changeLanguageButton = QtWidgets.QPushButton(self.centralwidget)
         self.changeLanguageButton.setObjectName("changeLanguageButton")
         self.horizontalLayout.addWidget(self.changeLanguageButton)
+
+        self.submitButton = QtWidgets.QPushButton(self.centralwidget)
+        self.submitButton.setObjectName("pushButton")
+        self.horizontalLayout.addWidget(self.submitButton)
 
         self.returnButton = QtWidgets.QPushButton(self.centralwidget)
         self.returnButton.setObjectName("returnButton")
@@ -143,7 +162,7 @@ class Ui_searchWordsScreen(object):
         # Assign functions to buttons (and table rows)
         self.tableView.clicked.connect(self.showFullText)
         self.changeLanguageButton.clicked.connect(self.changeLanguageSearch)
-        self.koreanWordLabel.clicked.connect(self.playCurrentWord)
+        self.submitButton.clicked.connect(self.submitWordChange)
         self.returnButton.clicked.connect(mainScreen.close)
 
         self.retranslateUi(mainScreen)
@@ -177,18 +196,53 @@ class Ui_searchWordsScreen(object):
         self.koreanWordLabel.setText(koreanWord)
         self.englishWordLabel.setText(englishWord)
 
-    def playCurrentWord(self):
-        """Play clicked word"""
+        self.koreanWord.setText(koreanWord)
+        self.englishWord.setText(englishWord)
+
+        self.item = item
+
+    def submitWordChange(self):
+        """Modify currently selected word"""
 
         koreanWord = self.koreanWordLabel.text()
-        if koreanWord != "":
-            self.soundplay.playSound("data/sounds/{}.mp3".format(koreanWord))
+        englishWord = self.englishWordLabel.text()
+        newKoreanWord = self.koreanWord.text()
+        newEnglishWord = self.englishWord.text()
+        if koreanWord == "":
+            return
+        if newKoreanWord == "" or newEnglishWord == "":
+            return
+        for i, word in enumerate(self.data["words"]):
+            if word["han"] == koreanWord:
+                if word["eng"] == englishWord:
+                    self.data["words"][i]["han"] = newKoreanWord
+                    self.data["words"][i]["eng"] = newEnglishWord
+                    self.koreanWordLabel.setText("")
+                    self.englishWordLabel.setText("")
+                    self.koreanWord.setText("")
+                    self.englishWord.setText("")
+                    self.submitButton.setText("Word was modified")
+                    if not os.path.isfile("data/sounds/{}.mp3".format(newKoreanWord)):
+                        tts = gTTS(newKoreanWord, lang="ko")
+                        tts.save("data/sounds/{}.mp3".format(newKoreanWord))
+                        print("[SOUND FILE: {}]     Created sound file: {}.mp3".format(
+                            time.strftime("%H:%M:%S"), newKoreanWord))
+                    QtCore.QTimer.singleShot(3000, partial(
+                        self.mainScreen.changeButtonText, self.submitButton, "Submit"))
+                    self.filter.setData(self.filter.index(
+                        self.item.row(), 0), newKoreanWord)
+                    self.filter.setData(self.filter.index(
+                        self.item.row(), 1), newEnglishWord)
+                    self.tableView.repaint()
+                    self.mainScreen.previousSaveLenghts[2] = True
+                    return
 
     def retranslateUi(self, mainScreen):
         _translate = QtCore.QCoreApplication.translate
         mainScreen.setWindowTitle(_translate("mainScreen", "MainWindow"))
         self.label.setText(_translate("mainScreen", "Search words"))
         self.koreanWordLabel.setText(_translate("mainScreen", ""))
+        self.submitButton.setText(_translate("mainScreen", "Submit"))
         self.englishWordLabel.setText(_translate("mainScreen", ""))
         self.changeLanguageButton.setText(_translate("mainScreen", "Korean"))
         self.returnButton.setText(_translate("mainScreen", "Return"))

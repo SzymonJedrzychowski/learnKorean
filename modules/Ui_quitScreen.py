@@ -4,7 +4,7 @@ from functools import partial
 
 class Ui_quitScreen(object):
     """Screen for quiting the app"""
-    
+
     def setupUi(self, mainScreen, **kwargs):
         self.screenName = "quitScreen"
         self.mainScreen = mainScreen

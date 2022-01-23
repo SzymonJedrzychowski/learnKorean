@@ -7,7 +7,7 @@ import time
 
 class Ui_repeatLearnedWordsScreen(object):
     """Screen to repeat learned words"""
-    
+
     def setupUi(self, mainScreen, **kwargs):
         self.screenName = "repeatLearnedWordsScreen"
         self.mainScreen = mainScreen
@@ -46,10 +46,12 @@ class Ui_repeatLearnedWordsScreen(object):
         self.horizontalLayout_3.setObjectName("horizontalLayout_3")
 
         self.koreanWordLabel = QLabelClickable(self.centralwidget)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.MinimumExpanding)
+        sizePolicy = QtWidgets.QSizePolicy(
+            QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.MinimumExpanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.koreanWordLabel.sizePolicy().hasHeightForWidth())
+        sizePolicy.setHeightForWidth(
+            self.koreanWordLabel.sizePolicy().hasHeightForWidth())
         self.koreanWordLabel.setSizePolicy(sizePolicy)
         font = QtGui.QFont()
         font.setPointSize(18)
@@ -65,10 +67,12 @@ class Ui_repeatLearnedWordsScreen(object):
         self.horizontalLayout_3.addItem(spacerItem)
 
         self.englishWordLabel = QtWidgets.QLabel(self.centralwidget)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.MinimumExpanding)
+        sizePolicy = QtWidgets.QSizePolicy(
+            QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.MinimumExpanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.englishWordLabel.sizePolicy().hasHeightForWidth())
+        sizePolicy.setHeightForWidth(
+            self.englishWordLabel.sizePolicy().hasHeightForWidth())
         self.englishWordLabel.setSizePolicy(sizePolicy)
         font = QtGui.QFont()
         font.setPointSize(18)

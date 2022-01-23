@@ -1,8 +1,9 @@
 import time
 
+
 def superMemo(answer: int, word: dict):
     """Returns updatet parameters for the word that was repeated.
-    
+
     :param answer: Correctness of answer: 1-correct, 0-incorrect,
     :param word: Word that was answered
 

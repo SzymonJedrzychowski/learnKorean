@@ -4,7 +4,7 @@ from functools import partial
 
 class Ui_removeWordsScreen(object):
     """Screen to remove words"""
-    
+
     def setupUi(self, mainScreen, **kwargs):
         self.screenName = "removeWordsScreen"
         self.mainScreen = mainScreen
@@ -51,10 +51,12 @@ class Ui_removeWordsScreen(object):
         self.horizontalLayout_4.setObjectName("horizontalLayout_4")
 
         self.koreanWordLabel = QtWidgets.QLabel(self.centralwidget)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.MinimumExpanding)
+        sizePolicy = QtWidgets.QSizePolicy(
+            QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.MinimumExpanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.koreanWordLabel.sizePolicy().hasHeightForWidth())
+        sizePolicy.setHeightForWidth(
+            self.koreanWordLabel.sizePolicy().hasHeightForWidth())
         self.koreanWordLabel.setSizePolicy(sizePolicy)
         font = QtGui.QFont()
         font.setPointSize(18)
@@ -70,10 +72,12 @@ class Ui_removeWordsScreen(object):
         self.horizontalLayout_4.addItem(spacerItem)
 
         self.englishWordLabel = QtWidgets.QLabel(self.centralwidget)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.MinimumExpanding)
+        sizePolicy = QtWidgets.QSizePolicy(
+            QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.MinimumExpanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.englishWordLabel.sizePolicy().hasHeightForWidth())
+        sizePolicy.setHeightForWidth(
+            self.englishWordLabel.sizePolicy().hasHeightForWidth())
         self.englishWordLabel.setSizePolicy(sizePolicy)
         font = QtGui.QFont()
         font.setPointSize(18)

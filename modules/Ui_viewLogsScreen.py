@@ -8,7 +8,7 @@ class Ui_viewLogsScreen(object):
 
     def __init__(self):
         self.deliberateZero = False
-    
+
     def setupUi(self, mainScreen, **kwargs):
         self.screenName = "viewLogsScreen"
         self.mainScreen = mainScreen

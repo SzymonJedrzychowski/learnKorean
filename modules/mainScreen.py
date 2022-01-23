@@ -1,7 +1,7 @@
 import json
 import time
 import os
-from modules import Ui_mainMenu, Ui_learnWordsScreen, Ui_repeatLearnedWordsScreen, Ui_repeatWordsScreen, Ui_viewLogsScreen, Ui_graphScreen, Ui_searchWordsScreen, Ui_modifySetScreen,  Ui_addWordsScreen, Ui_removeWordsScreen, Ui_quitScreen
+from modules import Ui_mainMenu, Ui_learnWordsScreen, Ui_repeatLearnedWordsScreen, Ui_repeatWordsScreen, Ui_viewLogsScreen, Ui_graphScreen, Ui_searchWordsScreen, Ui_modifySetScreen,  Ui_addWordsScreen, Ui_removeWordsScreen, Ui_modifyWordsScreen, Ui_quitScreen
 from modules import fileOperations
 from PyQt5 import QtWidgets, QtCore
 from copy import deepcopy
@@ -15,7 +15,7 @@ class mainScreen(QtWidgets.QMainWindow):
         super(mainScreen, self).__init__(parent)
         self.currentScreenName = None
         self.data = None
-        self.previousSaveLenghts = [0, 0]
+        self.previousSaveLenghts = [0, 0, False]
         self.logsSaveLogsLength = 0
         self.graphLimits = None
 
@@ -30,6 +30,7 @@ class mainScreen(QtWidgets.QMainWindow):
         self.modifySetScreen = Ui_modifySetScreen.Ui_modifySetScreen()
         self.addWordsScreen = Ui_addWordsScreen.Ui_addWordsScreen()
         self.removeWordsScreen = Ui_removeWordsScreen.Ui_removeWordsScreen()
+        self.modifyWordsScreen = Ui_modifyWordsScreen.Ui_modifyWordsScreen()
         self.quitScreen = Ui_quitScreen.Ui_quitScreen()
 
         # Loading data
@@ -56,16 +57,19 @@ class mainScreen(QtWidgets.QMainWindow):
             result = fileOperations.load(data["time"])
 
             if len(result) == 1:
-                print("File loaded succesfully")
+                print("[DATA FILE: {}]      File loaded successfuly".format(
+                    time.strftime("%H:%M:%S")))
             elif result[1] == 1:
-                print("File is up to date")
+                print("[DATA FILE: {}]      Data was already up to date".format(
+                    time.strftime("%H:%M:%S")))
             else:
-                print(
-                    "File on you machine is newer that in the cloud. Fix it and try again.")
+                print("[DATA FILE: {}]      Problems with data and time consistency".format(
+                    time.strftime("%H:%M:%S")))
                 return
 
         except Exception as ex:
-            print(ex)
+            print("[EXCEPTION: {}]      {}".format(
+                time.strftime("%H:%M:%S"), ex))
             return
 
         # Load the file again.
@@ -73,7 +77,7 @@ class mainScreen(QtWidgets.QMainWindow):
             self.data = json.load(f)
 
         self.previousSaveLenghts = [
-            len(self.data["words"]), len(self.data["logs"])]
+            len(self.data["words"]), len(self.data["logs"]), False]
         self.logsSaveLogsLength = len(self.data["logs"])
 
     def saveData(self, buttonToChange):
@@ -81,27 +85,32 @@ class mainScreen(QtWidgets.QMainWindow):
 
         :param buttonToChange: object of button which text will be changed during saving process
         """
-        
+
         buttonToChange.setText("Saving...")
+        buttonToChange.repaint()
         try:
             self.data["time"] = int(time.time())
 
-            if len(self.data["logs"]) != self.previousSaveLenghts[1] or len(self.data["words"]) != self.previousSaveLenghts[0]:
+            if len(self.data["logs"]) != self.previousSaveLenghts[1] or len(self.data["words"]) != self.previousSaveLenghts[0] or self.previousSaveLenghts[2]:
                 with open("data/json/data.json", "w") as sv:
                     json.dump(self.data, sv)
-                fileOperations.save(self.data["time"])
-                print("Data was saved")
+                fileOperations.save()
+                print("[DATA FILE: {}]      Data was saved".format(
+                    time.strftime("%H:%M:%S")))
                 self.previousSaveLenghts = [
-                    len(self.data["words"]), len(self.data["logs"])]
+                    len(self.data["words"]), len(self.data["logs"]), False]
                 buttonToChange.setText("Saved")
+                self.wordModified = False
             else:
                 buttonToChange.setText("No data to save")
-                print("There was no data to update")
+                print("[DATA FILE: {}]      There was no updates to be saved".format(
+                    time.strftime("%H:%M:%S")))
             QtCore.QTimer.singleShot(3000, partial(
                 self.changeButtonText, buttonToChange, "Save"))
 
         except Exception as ex:
-            print(ex)
+            print("[EXCEPTION: {}]      {}".format(
+                time.strftime("%H:%M:%S"), ex))
 
     def useScreen(self, screen, **kwargs):
         """Open new screen
@@ -199,7 +208,8 @@ class mainScreen(QtWidgets.QMainWindow):
             allWords.add(i["han"]+".mp3")
         for i in os.listdir("data/sounds"):
             if not i in allWords:
-                print("Removing not used sound file: data/sounds/{}".format(i))
+                print("[SOUND FILE: {}]     Removing unused sound file: {}.mp3".format(
+                    time.strftime("%H:%M:%S"), i))
                 os.remove("data/sounds/{}".format(i))
 
     def closeEvent(self, event):
@@ -211,7 +221,7 @@ class mainScreen(QtWidgets.QMainWindow):
         elif self.currentScreenName == "graphScreen":
             self.useScreen(self.viewLogsScreen, data=self.data)
             event.ignore()
-        elif self.currentScreenName in ["addWordsScreen", "removeWordsScreen"]:
+        elif self.currentScreenName in ["addWordsScreen", "removeWordsScreen", "modifyWordsScreen"]:
             self.useScreen(self.modifySetScreen, data=self.data)
             event.ignore()
         elif self.currentScreenName != "mainMenuScreen":

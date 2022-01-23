@@ -4,7 +4,7 @@ from functools import partial
 
 class Ui_modifySetScreen(object):
     """Screen for modyfying set"""
-    
+
     def setupUi(self, mainScreen, **kwargs):
         self.screenName = "modifySetScreen"
         self.mainScreen = mainScreen
@@ -46,6 +46,13 @@ class Ui_modifySetScreen(object):
         self.removeWordsButton.setObjectName("removeWordsButton")
         self.verticalLayout.addWidget(self.removeWordsButton)
 
+        self.modifyWordsButton = QtWidgets.QPushButton(self.centralwidget)
+        font = QtGui.QFont()
+        font.setPointSize(18)
+        self.modifyWordsButton.setFont(font)
+        self.modifyWordsButton.setObjectName("addWordsButton")
+        self.verticalLayout.addWidget(self.modifyWordsButton)
+
         self.returnButton = QtWidgets.QPushButton(self.centralwidget)
         font = QtGui.QFont()
         font.setPointSize(18)
@@ -66,6 +73,8 @@ class Ui_modifySetScreen(object):
             partial(self.mainScreen.useScreen, self.mainScreen.addWordsScreen))
         self.removeWordsButton.clicked.connect(
             partial(self.mainScreen.useScreen, self.mainScreen.removeWordsScreen))
+        self.modifyWordsButton.clicked.connect(
+            partial(self.mainScreen.useScreen, self.mainScreen.modifyWordsScreen))
         self.returnButton.clicked.connect(self.mainScreen.close)
 
         self.retranslateUi(self.mainScreen)
@@ -74,6 +83,7 @@ class Ui_modifySetScreen(object):
         # Assign shortcuts to buttons
         self.addWordsButton.setShortcut("Ctrl+1")
         self.removeWordsButton.setShortcut("Ctrl+2")
+        self.modifyWordsButton.setShortcut("Ctrl+3")
         self.returnButton.setShortcut("Ctrl+Q")
 
     def retranslateUi(self, mainScreen):
@@ -83,4 +93,6 @@ class Ui_modifySetScreen(object):
         self.addWordsButton.setText(_translate("mainScreen", "Add words"))
         self.removeWordsButton.setText(
             _translate("mainScreen", "Remove words"))
+        self.modifyWordsButton.setText(
+            _translate("mainScreen", "Modify words"))
         self.returnButton.setText(_translate("mainScreen", "Return"))

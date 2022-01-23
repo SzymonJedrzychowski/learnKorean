@@ -7,7 +7,7 @@ import random
 
 class Ui_repeatWordsScreen(object):
     """Screent to repeat words"""
-    
+
     def setupUi(self, mainScreen, **kwargs):
         self.screenName = "repeatWordsScreen"
         self.mainScreen = mainScreen
