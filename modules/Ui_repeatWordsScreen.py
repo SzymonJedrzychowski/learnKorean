@@ -173,7 +173,7 @@ class Ui_repeatWordsScreen(object):
         if self.wordsToRepeat:
             self.wordToShow = random.choice(self.wordsToRepeat)
             self.englishWordLabel.setText(
-                self.data["words"][self.wordToShow]["eng"])
+                self.data["words"][self.wordToShow]["eng"].split(" ["))
             self.koreanWordLabel.setText("")
         else:
             self.englishWordLabel.setText("All words were repeated")
@@ -254,6 +254,7 @@ class Ui_repeatWordsScreen(object):
 
                     self.submitButton.setText("Next")
                     self.koreanWordLabel.setText(word["han"])
+                    self.englishWordLabel.setText(word["eng"])
                     self.lineEdit.setStyleSheet(
                         "background: rgb(97, 224, 65); font-size: 18pt")
                     self.submitButton.setShortcut("Return")
@@ -264,6 +265,7 @@ class Ui_repeatWordsScreen(object):
                 else:
                     self.submitButton.setText("Repeat")
                     self.koreanWordLabel.setText(word["han"])
+                    self.englishWordLabel.setText(word["eng"])
                     self.lineEdit.setText("")
                     self.lineEdit.setStyleSheet(
                         "background: rgb(247, 81, 52); font-size: 18pt")

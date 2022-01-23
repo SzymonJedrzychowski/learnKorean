@@ -213,7 +213,7 @@ class mainScreen(QtWidgets.QMainWindow):
             allWords.add(i["han"]+".mp3")
         for i in os.listdir("data/sounds"):
             if not i in allWords:
-                print("[SOUND FILE: {}]     Removing unused sound file: {}.mp3".format(
+                print("[SOUND FILE: {}]     Removing unused sound file: {}".format(
                     time.strftime("%H:%M:%S"), i))
                 os.remove("data/sounds/{}".format(i))
 

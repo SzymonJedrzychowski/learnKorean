@@ -1,6 +1,7 @@
+import clipboard
+import time
 from PyQt5 import QtCore, QtGui, QtWidgets
 from functools import partial
-import clipboard
 
 
 class Ui_mainMenu(object):
@@ -134,9 +135,14 @@ class Ui_mainMenu(object):
         for i in self.data["words"]:
             if i["currentStreak"] > 0 and i["currentStreak"] < 3:
                 data += "{}	{}\n".format(i["han"], i["eng"])
-        clipboard.copy(data)
+        try:
+            clipboard.copy(data)
+            self.generateQuizletDataButton.setText("Copied!")
+        except Exception as ex:
+            self.generateQuizletDataButton.setText("Error!")
+            print("[EXCEPTION: {}]      {}".format(
+                time.strftime("%H:%M:%S"), ex))
 
-        self.generateQuizletDataButton.setText("Copied!")
         QtCore.QTimer.singleShot(3000, partial(
             self.mainScreen.changeButtonText, self.generateQuizletDataButton, "Generate quizlet data"))
 
