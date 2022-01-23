@@ -11,27 +11,27 @@ def superMemo(answer: int, word: dict):
     """
 
     if answer == 1:
-        if word["n"] == 0:
-            word["i"] = 1
+        if word["currentStreak"] == 0:
+            word["interval"] = 1
 
-        elif word["n"] == 1:
-            word["i"] = 6
+        elif word["currentStreak"] == 1:
+            word["interval"] = 6
 
         else:
-            word["i"] = round(word["i"]*word["ef"], 2)
+            word["interval"] = round(word["interval"]*word["easeFactor"], 2)
 
-        word["ef"] = round(word["ef"]+0.05, 2)
-        if word["ef"] < 1.3:
-            word["ef"] = 1.3
+        word["easeFactor"] = round(word["easeFactor"]+0.05, 2)
+        if word["easeFactor"] < 1.3:
+            word["easeFactor"] = 1.3
 
-        word["n"] += 1
+        word["currentStreak"] += 1
 
     else:
-        word["n"] = 0
-        word["i"] = 0
-        word["ef"] = max(0, round(word["ef"]-0.3, 2))
+        word["currentStreak"] = 0
+        word["interval"] = 0
+        word["easeFactor"] = max(0, round(word["easeFactor"]-0.3, 2))
     word["count"] += 1
-    word["date"] = int(time.time()+word["i"]*3600*24)
+    word["date"] = int(time.time()+word["interval"]*3600*24)
     word["localTime"] = time.localtime().tm_gmtoff
 
     return word

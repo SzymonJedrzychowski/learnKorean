@@ -94,7 +94,7 @@ class mainScreen(QtWidgets.QMainWindow):
             if len(self.data["logs"]) != self.previousSaveLenghts[1] or len(self.data["words"]) != self.previousSaveLenghts[0] or self.previousSaveLenghts[2]:
                 with open("data/json/data.json", "w") as sv:
                     json.dump(self.data, sv)
-                fileOperations.save()
+                fileOperations.save(self.data["time"])
                 print("[DATA FILE: {}]      Data was saved".format(
                     time.strftime("%H:%M:%S")))
                 self.previousSaveLenghts = [
@@ -123,7 +123,11 @@ class mainScreen(QtWidgets.QMainWindow):
         if self.currentScreenName == "viewLogsScreen":
             self.viewLogsScreen.setGraphLimits()
         elif self.currentScreenName == "graphScreen":
-            self.graphLimits = deepcopy(kwargs.get("graphLimits"))
+            self.graphLimits = kwargs.get("graphLimits")
+            if self.graphLimits[0] != "":
+                self.graphLimits[0] = int(self.graphLimits[0])
+            if self.graphLimits[1] != "":
+                self.graphLimits[1] = int(self.graphLimits[1])
 
     def saveLogs(self):
         """Modify logsSave after learning or repeating words"""
@@ -164,8 +168,9 @@ class mainScreen(QtWidgets.QMainWindow):
         # FOR 5
         self.data["logsSave"][day]["5"] = [0, 0, 0, 0, 0]
         for i in self.data["words"]:
-            if i["n"] != 0:
-                self.data["logsSave"][day]["5"][min(i["n"], 5)-1] += 1
+            if i["currentStreak"] != 0:
+                self.data["logsSave"][day]["5"][min(
+                    i["currentStreak"], 5)-1] += 1
 
         # FOR 3
         todayWords = {}

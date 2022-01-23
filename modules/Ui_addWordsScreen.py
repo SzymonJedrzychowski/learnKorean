@@ -201,7 +201,7 @@ class Ui_addWordsScreen(object):
                 print("[SOUND FILE: {}]     Created sound file: {}.mp3".format(
                     time.strftime("%H:%M:%S"), koreanWord))
             self.data["words"].insert(wordIndex, {
-                                      "han": koreanWord, "eng": englishWord, "n": 0, "ef": 2.5, "i": 0, "count": 0, "date": 0, "localTime": 0})
+                                      "han": koreanWord, "eng": englishWord, "currentStreak": 0, "easeFactor": 2.5, "nextInterval": 0, "count": 0, "date": 0, "localTime": 0})
             self.submitButton.setText("Word added")
             self.koreanWord.setText("")
             self.englishWord.setText("")

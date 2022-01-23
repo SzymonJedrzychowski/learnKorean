@@ -5,6 +5,7 @@ import numpy as np
 from tkinter import Y
 from PyQt5 import QtCore, QtGui, QtWidgets
 from matplotlib import cm
+from copy import deepcopy
 
 
 class Ui_graphScreen(object):
@@ -16,7 +17,7 @@ class Ui_graphScreen(object):
         self.data = self.mainScreen.data
 
         graphType = kwargs.get("graphType")
-        graphLimits = kwargs.get("graphLimits")
+        graphLimits = deepcopy(kwargs.get("graphLimits"))
 
         self.d0 = (int(time.time())+time.localtime().tm_gmtoff)//(3600*24)
         self.firstDay = (self.data["logs"][0]["time"] +

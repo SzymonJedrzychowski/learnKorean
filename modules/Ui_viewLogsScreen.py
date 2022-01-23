@@ -195,6 +195,9 @@ class Ui_viewLogsScreen(object):
         """Set limits for graphs in input boxes"""
 
         if self.mainScreen.graphLimits != None:
+            if self.mainScreen.graphLimits[1] != "":
+                if self.mainScreen.graphLimits[1] > self.lastDay:
+                    self.mainScreen.graphLimits[1] = self.lastDay
             if self.mainScreen.graphLimits[0] != self.firstDay:
                 self.startLimit.setText(str(self.mainScreen.graphLimits[0]))
             if self.mainScreen.graphLimits[1] != self.lastDay and (self.mainScreen.graphLimits[1] != 0 or (self.mainScreen.graphLimits[1] == 0 and self.deliberateZero == True)):

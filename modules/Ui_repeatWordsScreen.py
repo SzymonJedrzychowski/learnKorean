@@ -215,8 +215,8 @@ class Ui_repeatWordsScreen(object):
                         "correct": 0,
                         "time": int(time.time()),
                         "count": self.data["words"][self.wordToShow]["count"],
-                        "nextI": self.data["words"][self.wordToShow]["i"],
-                        "ease": self.data["words"][self.wordToShow]["ef"],
+                        "interval": self.data["words"][self.wordToShow]["interval"],
+                        "easeFactor": self.data["words"][self.wordToShow]["easeFactor"],
                         "localTime": self.secondsDifference,
                         "currentStreak": 0
                     })
@@ -243,8 +243,8 @@ class Ui_repeatWordsScreen(object):
                         "correct": 1,
                         "time": int(time.time()),
                         "count": self.data["words"][self.wordToShow]["count"],
-                        "nextI": self.data["words"][self.wordToShow]["i"],
-                        "ease": self.data["words"][self.wordToShow]["ef"],
+                        "interval": self.data["words"][self.wordToShow]["interval"],
+                        "easeFactor": self.data["words"][self.wordToShow]["easeFactor"],
                         "localTime": self.secondsDifference,
                         "currentStreak": self.data["words"][self.wordToShow]["n"]
                     })
@@ -285,8 +285,8 @@ class Ui_repeatWordsScreen(object):
                 "correct": 1,
                 "time": int(time.time()),
                 "count": self.data["words"][self.wordToShow]["count"],
-                "nextI": self.data["words"][self.wordToShow]["i"],
-                "ease": self.data["words"][self.wordToShow]["ef"],
+                "interval": self.data["words"][self.wordToShow]["interval"],
+                "easeFactor": self.data["words"][self.wordToShow]["easeFactor"],
                 "localTime": self.secondsDifference,
                 "currentStreak": self.data["words"][self.wordToShow]["n"]
             })

@@ -40,7 +40,7 @@ def load(lastFileTime: int):
         fileId='1-XFgSplPR3imq2DfH_opeaxpmM4W-ct7', fields="description").execute()["description"])
 
     if thisFileTime < lastFileTime:
-        return [False, 1]
+        return [False, 0]
     elif thisFileTime == lastFileTime:
         return [False, 1]
 
@@ -57,10 +57,12 @@ def load(lastFileTime: int):
     return [True]
 
 
-def save():
-    """Save data to the google drive"""
+def save(currentTime: int):
+    """Save data to the google drive
 
-    currentTime = int(time.time())
+    :param currentTime: time of save
+    """
+
     creds = None
 
     dataPath = str(

@@ -215,8 +215,8 @@ class Ui_learnWordsScreen(object):
                     "correct": 1,
                     "time": int(time.time()),
                     "count": 1,
-                    "nextI": 0,
-                    "ease": self.data["words"][self.wordsToLearn[0]]["ef"],
+                    "interval": 0,
+                    "easeFactor": self.data["words"][self.wordsToLearn[0]]["easeFactor"],
                     "localTime": self.secondsDifference,
                     "currentStreak": 0
                 })
