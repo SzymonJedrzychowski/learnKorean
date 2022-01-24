@@ -116,12 +116,11 @@ class Ui_removeWordsScreen(object):
         # Create ability to display only parts of the set
 
         # Create model with all not learned words
-        self.model = QtGui.QStandardItemModel(len(self.data["words"]), 1)
+        words = [i for i in self.data["words"] if i["count"] == 0]
+        self.model = QtGui.QStandardItemModel(len(words), 1)
         self.model.setHorizontalHeaderLabels(["Korean", "English"])
         row = 0
-        for word in self.data["words"]:
-            if word["count"] > 0:
-                continue
+        for word in words:
             koreanWord = QtGui.QStandardItem(word["han"])
             englishWord = QtGui.QStandardItem(word["eng"])
             self.model.setItem(row, 0, koreanWord)

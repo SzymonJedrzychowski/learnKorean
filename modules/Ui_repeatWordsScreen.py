@@ -173,7 +173,7 @@ class Ui_repeatWordsScreen(object):
         if self.wordsToRepeat:
             self.wordToShow = random.choice(self.wordsToRepeat)
             self.englishWordLabel.setText(
-                self.data["words"][self.wordToShow]["eng"].split(" ["))
+                self.data["words"][self.wordToShow]["eng"].split(" [")[0])
             self.koreanWordLabel.setText("")
         else:
             self.englishWordLabel.setText("All words were repeated")
@@ -246,7 +246,7 @@ class Ui_repeatWordsScreen(object):
                         "interval": self.data["words"][self.wordToShow]["interval"],
                         "easeFactor": self.data["words"][self.wordToShow]["easeFactor"],
                         "localTime": self.secondsDifference,
-                        "currentStreak": self.data["words"][self.wordToShow]["n"]
+                        "currentStreak": self.data["words"][self.wordToShow]["currentStreak"]
                     })
 
                     self.wordsLeftLabel.setText(
@@ -290,7 +290,7 @@ class Ui_repeatWordsScreen(object):
                 "interval": self.data["words"][self.wordToShow]["interval"],
                 "easeFactor": self.data["words"][self.wordToShow]["easeFactor"],
                 "localTime": self.secondsDifference,
-                "currentStreak": self.data["words"][self.wordToShow]["n"]
+                "currentStreak": self.data["words"][self.wordToShow]["currentStreak"]
             })
 
             self.wordsToRepeat.remove(self.wordToShow)

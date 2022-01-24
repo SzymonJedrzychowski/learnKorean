@@ -1,0 +1,247 @@
+Version 1.0
+
+- Added funcionality: Learn words,
+
+- Added funcionality: Repeat words,
+
+- Added funcionality: View logs:
+    - Words daily,
+    - Accuracy daily,
+    - Accuracy hourly.
+
+----------------------------------------
+
+Version 1.1
+
+- Modified funcionality: Repeat words:
+    - Words can be now repeated given time before their next repeat time,
+
+- Modified funcionality: View logs:
+    - Simplified view of x-axis in some of the graphs,
+
+- Edited some if displayed text.
+
+----------------------------------------
+
+Version 1.1.1
+
+- Modified funcionality: Learn words:
+    - Wrong answer does not change the parameters of word anymore,
+
+- Added funcionality: "saves" directory:
+    - During first run of the program each day, data.json is saved to "saves" directory,
+
+- Edited some if displayed text.
+
+----------------------------------------
+
+Version 1.2
+
+- Modified funcionality: Learn words, Repeat words:
+    - There is a sound of each word during learning and repeating words,
+
+- Modified funcionality: View logs:
+    - New types of logs were added:
+        - Words type daily,
+        - Words from previous day daily,
+        - Word types,
+        - Ease factor,
+    - Averages of 3 and 7 days accuracy were added to Accuracy daily logs type, 
+
+- General cleaning and rewriting of the code.
+
+----------------------------------------
+
+Version 1.3
+
+- New funcionality: saving data in cloud:
+    - Every time program is started it downloads file with data if necessary, and then saves it at exit.
+
+----------------------------------------
+
+Version 1.3.1
+
+- Removed funcionality: "saves" directory,
+
+- Removed "data.json" file from git repository.
+
+----------------------------------------
+
+Version 1.4
+
+- Modified funcionality: View logs:
+    - The code was fully rewritten,
+    - New type of logs was added:
+        - Word types history,
+
+- General cleaning and rewriting of the code.
+
+----------------------------------------
+
+Version 1.4.1
+
+- Bug fixes.
+
+----------------------------------------
+
+Version 1.4.2
+
+- Fix: amount of words to repeat is equal to the amount of words shown in logs.
+
+----------------------------------------
+
+Version 1.4.3
+
+- Bug fixes.
+
+----------------------------------------
+
+Version 1.4.4
+
+- Bug fixes for downloading online file.
+
+----------------------------------------
+
+Version 1.5
+
+- Modified funcionality: View logs:
+    - Added ability of choosing range for logs.
+
+----------------------------------------
+
+Version 1.5.1
+
+- Changed method the online file is found and downloaded,
+
+- Removed "timeSpent" from logs,
+
+- Rewrited code for View logs,
+
+- Implemented check if data needs to be uploaded in case of no changes.
+
+----------------------------------------
+
+Version 1.5.2
+
+- View logs bug fix.
+
+----------------------------------------
+
+Version 1.5.3
+
+- Added logsSave in data file,
+
+- Added functionality: Save logs:
+    - logs are now saved after learning and repeating in order to improve preparing data for View logs graphs.
+
+----------------------------------------
+
+Version 1.5.4
+
+- Rewrited code for View logs.
+
+----------------------------------------
+
+Version 1.5.5
+
+- View logs bug fix (caused by logs save).
+
+----------------------------------------
+
+Version 1.5.6
+
+- View logs for Words daily is now at fixed y limit (0 to 1).
+
+----------------------------------------
+
+Version 2.0.0
+
+- Rewrited code with GUI,
+
+- Changed naming of sound files,
+
+- Added functionality: Modify set:
+    - Removing words,
+    - Adding words,
+
+- Added functionality: Search words:
+    - Searching for words in either Korean or English,
+
+- Added functionality: Generate quizlet data:
+    - Data for quizlet is generated based on words datam,
+
+- Modified funcionality: View logs:
+    - Removed types of logs:
+        - Accuracy hourly,
+        - Word types,
+        - Ease factor,
+
+- Reorganised directory structure,
+
+----------------------------------------
+
+Version 2.0.1
+
+- Bug fixes.
+
+----------------------------------------
+
+Version 2.0.2
+
+- Created .gitignore file,
+
+- Bug fixes for displaying and inputing graph limits for View logs.
+
+----------------------------------------
+
+Version 2.0.3
+
+- Modified funcionality: Modify set:
+    - Added type of Modify set:
+        - Modify words,
+
+- Refactoring code,
+
+- Changed text displayed in terminal,
+
+- Bug fixes for Add words: new sounds files are now generated in correct place, words are now appended to list of words.
+
+----------------------------------------
+
+Version 2.0.4
+
+- Renamed variables in "data.json" file,
+
+- Rewrited code for changing between screens,
+
+- Bug fixes for displaying and inputing graph limits for View logs,
+
+- Bug fix for saving data online.
+
+----------------------------------------
+
+Version 2.0.5
+
+- Bug fix for the Generate quizlet data function,
+
+- Implemented ability for repeating words to have different text before and after answer.
+
+----------------------------------------
+
+Version 2.0.6
+
+- Limits for Add words screen are now correctly changing after adding a word,
+
+- Table in Remove words screen has now correct length,
+
+- Removed sounds directory from git,
+
+- Added changeLog to git,
+
+- Added creation of missing directories,
+
+- Added downloading necessary sounds on start of the program,
+
+- Program is now stopped if "token.json" is invalid,
+
+- Bug fix for the different words for repeating words.

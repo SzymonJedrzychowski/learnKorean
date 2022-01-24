@@ -178,6 +178,7 @@ class Ui_addWordsScreen(object):
 
         :return list(lowerLimit, higherLimit): limits
         """
+
         lastDay = list(self.data["logsSave"].keys())[-1]
         lowerLimit = sum(self.data["logsSave"][lastDay]["5"])
         higherLimit = len(self.data["words"])
@@ -194,17 +195,24 @@ class Ui_addWordsScreen(object):
         if koreanWord == "" or englishWord == "" or wordIndex == "" or wordIndex < self.limits[0] or wordIndex > self.limits[1]:
             self.submitButton.setText("Error")
         else:
+            self.limits[1] += 1
+            validator = QtGui.QIntValidator(self.limits[0], self.limits[1])
+            self.inputIndex.setValidator(validator)
+            self.maximumIndexLabel.setText(
+                "Maximum Index: {}".format(self.limits[1]))
+            self.data["words"].insert(wordIndex, {
+                                      "han": koreanWord, "eng": englishWord, "currentStreak": 0, "easeFactor": 2.5, "nextInterval": 0, "count": 0, "date": 0, "localTime": 0})
+            self.submitButton.setText("Word added")
+            self.koreanWord.setText("")
+            self.englishWord.setText("")
+
             # Create sound file if no file with such korean word is already in sounds directory
             if not os.path.isfile("data/sounds/{}.mp3".format(koreanWord)):
                 tts = gTTS(koreanWord, lang="ko")
                 tts.save("data/sounds/{}.mp3".format(koreanWord))
                 print("[SOUND FILE: {}]     Created sound file: {}.mp3".format(
                     time.strftime("%H:%M:%S"), koreanWord))
-            self.data["words"].insert(wordIndex, {
-                                      "han": koreanWord, "eng": englishWord, "currentStreak": 0, "easeFactor": 2.5, "nextInterval": 0, "count": 0, "date": 0, "localTime": 0})
-            self.submitButton.setText("Word added")
-            self.koreanWord.setText("")
-            self.englishWord.setText("")
+
         QtCore.QTimer.singleShot(3000, partial(
             self.mainScreen.changeButtonText, self.submitButton, "Submit"))
 

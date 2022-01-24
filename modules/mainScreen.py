@@ -6,6 +6,7 @@ from modules import fileOperations
 from PyQt5 import QtWidgets, QtCore
 from copy import deepcopy
 from functools import partial
+from gtts import gTTS
 
 
 class mainScreen(QtWidgets.QMainWindow):
@@ -33,11 +34,40 @@ class mainScreen(QtWidgets.QMainWindow):
         self.modifyWordsScreen = Ui_modifyWordsScreen.Ui_modifyWordsScreen()
         self.quitScreen = Ui_quitScreen.Ui_quitScreen()
 
+        # Check if directories are present and create empty ones if they are missing
+        self.checkDirectories()
+
         # Loading data
         self.loadData()
 
+        # Create missing sounds
+        self.createSounds()
+
         # Starting with main menu screen
         self.useScreen(self.mainMenuScreen, data=self.data)
+
+    def checkDirectories(self):
+        """Check if necessary directories are present, if not create empty ones"""
+
+        if os.path.isdir("data"):
+            if not os.path.isdir("data/json"):
+                os.mkdir("data/json")
+                print("[DIRECTORY: {}]      Directory data/json was created".format(
+                    time.strftime("%H:%M:%S")))
+            if not os.path.isdir("data/sounds"):
+                os.mkdir("data/sounds")
+                print("[DIRECTORY: {}]      Directory data/sounds was created".format(
+                    time.strftime("%H:%M:%S")))
+        else:
+            os.mkdir("data")
+            print("[DIRECTORY: {}]      Directory data was created".format(
+                time.strftime("%H:%M:%S")))
+            os.mkdir("data/json")
+            print("[DIRECTORY: {}]      Directory data/json was created".format(
+                time.strftime("%H:%M:%S")))
+            os.mkdir("data/sounds")
+            print("[DIRECTORY: {}]      Directory data/sounds was created".format(
+                time.strftime("%H:%M:%S")))
 
     def loadData(self):
         """Load data from local file and compare it to online one"""
@@ -70,7 +100,7 @@ class mainScreen(QtWidgets.QMainWindow):
         except Exception as ex:
             print("[EXCEPTION: {}]      {}".format(
                 time.strftime("%H:%M:%S"), ex))
-            return
+            exit()
 
         # Load the file again.
         with open("data/json/data.json") as f:
@@ -111,6 +141,17 @@ class mainScreen(QtWidgets.QMainWindow):
         except Exception as ex:
             print("[EXCEPTION: {}]      {}".format(
                 time.strftime("%H:%M:%S"), ex))
+
+    def createSounds(self):
+        """Create missing sounds"""
+
+        wordsLength = len(self.data["words"])
+        for i, word in enumerate(self.data["words"]):
+            if not os.path.isfile("data/sounds/{}.mp3".format(word["han"])):
+                tts = gTTS(word["han"], lang="ko")
+                tts.save("data/sounds/{}.mp3".format(word["han"]))
+                print("[SOUND FILE: {}]     ({}/{})   Created sound file: {}.mp3".format(
+                    time.strftime("%H:%M:%S"), i, wordsLength, word["han"]))
 
     def useScreen(self, screen, **kwargs):
         """Open new screen
