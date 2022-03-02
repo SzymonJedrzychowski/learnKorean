@@ -1,92 +1,63 @@
-import io
-import os
-import time
-from googleapiclient.discovery import build
-from google_auth_oauthlib.flow import InstalledAppFlow
-from google.auth.transport.requests import Request
-from google.oauth2.credentials import Credentials
-from apiclient.http import MediaFileUpload, MediaIoBaseDownload
-from pathlib import Path
+import discord
+import asyncio
+import platform
+import json
 
 
 def load(lastFileTime: int):
-    """Load file from the google drive
+    """Load file from the discord channel
 
     :param lastFileTime: time of last save of save file
     """
-    creds = None
 
-    dataPath = str(
-        Path("fileOperations.py").absolute().parents[0])+"/data/json/"
+    if platform.system() == 'Windows':
+        asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
-    if os.path.exists('{}token.json'.format(dataPath)):
-        creds = Credentials.from_authorized_user_file('{}token.json'.format(
-            dataPath), ['https://www.googleapis.com/auth/drive'])
+    with open("data/json/discordData.json") as f:
+        discordData = json.load(f)
 
-    if not creds or not creds.valid:
-        if creds and creds.expired and creds.refresh_token:
-            creds.refresh(Request())
-        else:
-            flow = InstalledAppFlow.from_client_secrets_file(
-                '{}credentials.json'.format(dataPath), ['https://www.googleapis.com/auth/drive'])
-            creds = flow.run_local_server(port=0)
+    client = discord.Client()
 
-        with open('{}token.json'.format(dataPath), 'w') as token:
-            token.write(creds.to_json())
+    @client.event
+    async def on_ready():
+        file = (await client.get_channel(discordData["channelId"]).history(limit=1).flatten())[0]
+        await file.attachments[0].save(fp="data/json/tempData.json")
+        with open("data/json/tempData.json") as f:
+            data = json.load(f)
+            thisFileTime = data["time"]
+            if thisFileTime > lastFileTime:
+                await file.attachments[0].save(fp="data/json/data.json")
 
-    service = build('drive', 'v3', credentials=creds)
+        await client.close()
 
-    thisFileTime = int(service.files().get(
-        fileId='1-XFgSplPR3imq2DfH_opeaxpmM4W-ct7', fields="description").execute()["description"])
+    client.run(discordData["token"])
+
+    with open("data/json/tempData.json") as f:
+        data = json.load(f)
+        thisFileTime = data["time"]
 
     if thisFileTime < lastFileTime:
         return [False, 0]
     elif thisFileTime == lastFileTime:
         return [False, 1]
 
-    request = service.files().get_media(fileId='1-XFgSplPR3imq2DfH_opeaxpmM4W-ct7')
-    fh = io.BytesIO()
-    downloader = MediaIoBaseDownload(fh, request)
-    done = False
-    while done is False:
-        status, done = downloader.next_chunk()
-
-    with open("{}data.json".format(dataPath), "wb") as f:
-        f.write(fh.getbuffer())
-
     return [True]
 
 
-def save(currentTime: int):
-    """Save data to the google drive
+def save():
+    """Save data on discord channel"""
 
-    :param currentTime: time of save
-    """
+    if platform.system() == 'Windows':
+        asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
-    creds = None
+    with open("data/json/discordData.json") as f:
+        discordData = json.load(f)
 
-    dataPath = str(
-        Path("fileOperations.py").absolute().parents[0])+"/data/json/"
+    client = discord.Client()
 
-    if os.path.exists('{}token.json'.format(dataPath)):
-        creds = Credentials.from_authorized_user_file('{}token.json'.format(
-            dataPath), ['https://www.googleapis.com/auth/drive'])
+    @client.event
+    async def on_ready():
+        await client.get_channel(discordData["channelId"]).send(file=discord.File("data/json/data.json"))
+        await client.close()
 
-    if not creds or not creds.valid:
-        if creds and creds.expired and creds.refresh_token:
-            creds.refresh(Request())
-        else:
-            flow = InstalledAppFlow.from_client_secrets_file(
-                '{}credentials.json'.format(dataPath), ['https://www.googleapis.com/auth/drive'])
-            creds = flow.run_local_server(port=0)
-
-        with open('{}token.json'.format(dataPath), 'w') as token:
-            token.write(creds.to_json())
-
-    service = build('drive', 'v3', credentials=creds)
-
-    media = MediaFileUpload('{}data.json'.format(dataPath),
-                            mimetype='text/json',
-                            resumable=True)
-    file = service.files().update(fileId='1-XFgSplPR3imq2DfH_opeaxpmM4W-ct7',
-                                  media_body=media, body={"description": currentTime}).execute()
+    client.run(discordData["token"])

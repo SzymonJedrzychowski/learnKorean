@@ -4,7 +4,6 @@ import os
 from modules import Ui_mainMenu, Ui_learnWordsScreen, Ui_repeatLearnedWordsScreen, Ui_repeatWordsScreen, Ui_viewLogsScreen, Ui_graphScreen, Ui_searchWordsScreen, Ui_modifySetScreen,  Ui_addWordsScreen, Ui_removeWordsScreen, Ui_modifyWordsScreen, Ui_quitScreen
 from modules import fileOperations
 from PyQt5 import QtWidgets, QtCore
-from copy import deepcopy
 from functools import partial
 from gtts import gTTS
 
@@ -82,7 +81,7 @@ class mainScreen(QtWidgets.QMainWindow):
             with open("data/json/data.json", "w") as f:
                 json.dump(data, f)
 
-        # Try downloading new file from google drive
+        # Try downloading new file from discord
         try:
             result = fileOperations.load(data["time"])
 
@@ -95,7 +94,7 @@ class mainScreen(QtWidgets.QMainWindow):
             else:
                 print("[DATA FILE: {}]      Problems with data and time consistency".format(
                     time.strftime("%H:%M:%S")))
-                return
+                exit()
 
         except Exception as ex:
             print("[EXCEPTION: {}]      {}".format(
@@ -111,7 +110,7 @@ class mainScreen(QtWidgets.QMainWindow):
         self.logsSaveLogsLength = len(self.data["logs"])
 
     def saveData(self, buttonToChange):
-        """Save data and upload it to google drive
+        """Save data and upload it to discord
 
         :param buttonToChange: object of button which text will be changed during saving process
         """
@@ -124,7 +123,7 @@ class mainScreen(QtWidgets.QMainWindow):
             if len(self.data["logs"]) != self.previousSaveLenghts[1] or len(self.data["words"]) != self.previousSaveLenghts[0] or self.previousSaveLenghts[2]:
                 with open("data/json/data.json", "w") as sv:
                     json.dump(self.data, sv)
-                fileOperations.save(self.data["time"])
+                fileOperations.save()
                 print("[DATA FILE: {}]      Data was saved".format(
                     time.strftime("%H:%M:%S")))
                 self.previousSaveLenghts = [
