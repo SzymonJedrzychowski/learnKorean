@@ -245,3 +245,11 @@ Version 2.0.6
 - Program is now stopped if "token.json" is invalid,
 
 - Bug fix for the different words for repeating words.
+
+----------------------------------------
+
+Version 2.0.7
+
+- Moved to pyclip,
+
+- Refactoring of the code.

@@ -151,7 +151,7 @@ class mainScreen(QtWidgets.QMainWindow):
                 tts = gTTS(word["han"], lang="ko")
                 tts.save("data/sounds/{}.mp3".format(word["han"]))
                 print("[SOUND FILE: {}]     ({}/{})   Created sound file: {}.mp3".format(
-                    time.strftime("%H:%M:%S"), i, wordsLength, word["han"]))
+                    time.strftime("%H:%M:%S"), i+1, wordsLength, word["han"]))
 
     def useScreen(self, screen, **kwargs):
         """Open new screen

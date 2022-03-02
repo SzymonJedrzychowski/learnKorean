@@ -43,6 +43,9 @@ class Ui_repeatWordsScreen(object):
         self.horizontalLayout_3.setObjectName("horizontalLayout_3")
 
         self.englishWordLabel = QtWidgets.QLabel(self.centralwidget)
+        font = QtGui.QFont()
+        font.setPointSize(18)
+        self.englishWordLabel.setFont(font)
         self.englishWordLabel.setFrameShape(QtWidgets.QFrame.Box)
         self.englishWordLabel.setAlignment(QtCore.Qt.AlignCenter)
         self.englishWordLabel.setWordWrap(True)
@@ -54,6 +57,9 @@ class Ui_repeatWordsScreen(object):
         self.horizontalLayout_3.addItem(spacerItem)
 
         self.koreanWordLabel = QLabelClickable(self.centralwidget)
+        font = QtGui.QFont()
+        font.setPointSize(18)
+        self.koreanWordLabel.setFont(font)
         self.koreanWordLabel.setFrameShape(QtWidgets.QFrame.Box)
         self.koreanWordLabel.setAlignment(QtCore.Qt.AlignCenter)
         self.koreanWordLabel.setWordWrap(True)
@@ -200,8 +206,7 @@ class Ui_repeatWordsScreen(object):
                     "background: rgb(255, 255, 255); font-size: 18pt")
                 self.submitButton.setShortcut("Return")
                 self.setWord()
-                self.beingPressed = False
-                return
+
             elif self.submitButton.text() == "Repeat":
                 word = self.data["words"][self.wordToShow]
                 input = self.lineEdit.text()

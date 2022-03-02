@@ -1,4 +1,4 @@
-import clipboard
+import pyclip
 import time
 from PyQt5 import QtCore, QtGui, QtWidgets
 from functools import partial
@@ -136,7 +136,7 @@ class Ui_mainMenu(object):
             if i["currentStreak"] > 0 and i["currentStreak"] < 3:
                 data += "{}	{}\n".format(i["han"], i["eng"])
         try:
-            clipboard.copy(data)
+            pyclip.copy(data)
             self.generateQuizletDataButton.setText("Copied!")
         except Exception as ex:
             self.generateQuizletDataButton.setText("Error!")
