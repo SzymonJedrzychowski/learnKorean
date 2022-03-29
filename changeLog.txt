@@ -263,3 +263,13 @@ Version 2.0.8
 - Refactoring of the code,
 
 - Bux fix for situation when file cannot be loaded.
+
+----------------------------------------
+
+Version 2.0.9
+
+- Moved from discord api back to google drive api (with pydrive2 wrapper),
+
+- Refactoring of the code,
+
+- Bug fix that prevent sounds being played on Windows - sounds names are now saved as hash value, not Korean words.

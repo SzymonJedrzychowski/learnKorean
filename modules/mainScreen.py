@@ -6,6 +6,7 @@ from modules import fileOperations
 from PyQt5 import QtWidgets, QtCore
 from functools import partial
 from gtts import gTTS
+import hashlib
 
 
 class mainScreen(QtWidgets.QMainWindow):
@@ -87,7 +88,7 @@ class mainScreen(QtWidgets.QMainWindow):
 
             if len(result) == 1:
                 print("[DATA FILE: {}]      File loaded successfuly".format(
-                    time.strftime("%H:%M:%S")))
+                    time.strftime("%H:%M:%1")))
             elif result[1] == 1:
                 print("[DATA FILE: {}]      Data was already up to date".format(
                     time.strftime("%H:%M:%S")))
@@ -146,11 +147,12 @@ class mainScreen(QtWidgets.QMainWindow):
 
         wordsLength = len(self.data["words"])
         for i, word in enumerate(self.data["words"]):
-            if not os.path.isfile("data/sounds/{}.mp3".format(word["han"])):
+            if not os.path.isfile("data/sounds/{}.mp3".format(hashlib.md5(word["han"].encode("utf-8")).hexdigest())):
                 tts = gTTS(word["han"], lang="ko")
-                tts.save("data/sounds/{}.mp3".format(word["han"]))
-                print("[SOUND FILE: {}]     ({}/{})   Created sound file: {}.mp3".format(
-                    time.strftime("%H:%M:%S"), i+1, wordsLength, word["han"]))
+                tts.save(
+                    "data/sounds/{}.mp3".format(hashlib.md5(word["han"].encode("utf-8")).hexdigest()))
+                print("[SOUND FILE: {}]     ({}/{})   Created sound file: {}.mp3 ({})".format(
+                    time.strftime("%H:%M:%S"), i+1, wordsLength, hashlib.md5(word["han"].encode("utf-8")).hexdigest(), word["han"]))
 
     def useScreen(self, screen, **kwargs):
         """Open new screen
@@ -250,7 +252,8 @@ class mainScreen(QtWidgets.QMainWindow):
         with open("data/json/data.json") as f:
             data = json.load(f)
         for i in data["words"]:
-            allWords.add(i["han"]+".mp3")
+            allWords.add(hashlib.md5(
+                i["han"].encode("utf-8")).hexdigest()+".mp3")
         for i in os.listdir("data/sounds"):
             if not i in allWords:
                 print("[SOUND FILE: {}]     Removing unused sound file: {}".format(

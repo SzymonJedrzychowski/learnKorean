@@ -1,6 +1,5 @@
 import os
 import time
-from hashlib import new
 from PyQt5 import QtCore, QtGui, QtWidgets
 from functools import partial
 from gtts import gTTS

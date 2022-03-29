@@ -1,7 +1,7 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from modules import playControl
-from modules import clickableLabel
 from modules.clickableLabel import QLabelClickable
+import hashlib
 
 
 class Ui_searchWordsScreen(object):
@@ -12,7 +12,7 @@ class Ui_searchWordsScreen(object):
         self.mainScreen = mainScreen
         self.data = mainScreen.data
 
-        self.soundplay = playControl.playControl()
+        self.playControl = playControl.playControl()
 
         # Create layout for the screen: start
         mainScreen.setObjectName("mainScreen")
@@ -182,7 +182,8 @@ class Ui_searchWordsScreen(object):
 
         koreanWord = self.koreanWordLabel.text()
         if koreanWord != "":
-            self.soundplay.playSound("data/sounds/{}.mp3".format(koreanWord))
+            self.playControl.playSound(
+                "data/sounds/{}.mp3".format(hashlib.md5(koreanWord.encode("utf-8")).hexdigest()))
 
     def retranslateUi(self, mainScreen):
         _translate = QtCore.QCoreApplication.translate

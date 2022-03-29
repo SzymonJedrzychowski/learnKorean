@@ -3,6 +3,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from modules import playControl
 from modules.clickableLabel import QLabelClickable
 import time
+import hashlib
 
 
 class Ui_repeatLearnedWordsScreen(object):
@@ -116,7 +117,7 @@ class Ui_repeatLearnedWordsScreen(object):
         koreanWord = self.koreanWordLabel.text()
         if koreanWord != "":
             self.playControl.playSound(
-                "data/sounds/{}.mp3".format(koreanWord))
+                "data/sounds/{}.mp3".format(hashlib.md5(koreanWord.encode("utf-8")).hexdigest()))
 
     def showFullText(self, item):
         """Show clicked word in the labels"""

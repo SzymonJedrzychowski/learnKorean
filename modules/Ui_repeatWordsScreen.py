@@ -3,6 +3,7 @@ from modules import playControl, superMemo
 from modules.clickableLabel import QLabelClickable
 import time
 import random
+import hashlib
 
 
 class Ui_repeatWordsScreen(object):
@@ -150,7 +151,8 @@ class Ui_repeatWordsScreen(object):
 
         koreanWord = self.koreanWordLabel.text()
         if koreanWord != "":
-            self.playControl.playSound("data/sounds/{}.mp3".format(koreanWord))
+            self.playControl.playSound(
+                "data/sounds/{}.mp3".format(hashlib.md5(koreanWord.encode("utf-8")).hexdigest()))
 
     def getWordsToRepeat(self):
         """Get words that need to be repeated today
@@ -233,7 +235,7 @@ class Ui_repeatWordsScreen(object):
                 else:
                     self.lineEdit.setText("")
                     self.playControl.playSound(
-                        "data/sounds/{}.mp3".format(word["han"]))
+                        "data/sounds/{}.mp3".format(hashlib.md5(word["han"].encode("utf-8")).hexdigest()))
 
             elif self.submitButton.text() == "Submit":
                 word = self.data["words"][self.wordToShow]
@@ -266,7 +268,7 @@ class Ui_repeatWordsScreen(object):
 
                     self.wordsToRepeat.remove(self.wordToShow)
                     self.playControl.playSound(
-                        "data/sounds/{}.mp3".format(word["han"]))
+                        "data/sounds/{}.mp3".format(hashlib.md5(word["han"].encode("utf-8")).hexdigest()))
                 else:
                     self.submitButton.setText("Repeat")
                     self.koreanWordLabel.setText(word["han"])
@@ -276,7 +278,7 @@ class Ui_repeatWordsScreen(object):
                         "background: rgb(247, 81, 52); font-size: 18pt")
                     self.submitButton.setShortcut("Return")
                     self.playControl.playSound(
-                        "data/sounds/{}.mp3".format(word["han"]))
+                        "data/sounds/{}.mp3".format(hashlib.md5(word["han"].encode("utf-8")).hexdigest()))
 
             self.beingPressed = False
 

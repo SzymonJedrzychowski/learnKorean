@@ -115,14 +115,14 @@ class Ui_graphScreen(object):
             except:
                 pass
 
-        df = pd.DataFrame({'x': x,
-                           'y1': [i[0] for i in wordData],
-                           'y2': [i[1] for i in wordData],
-                           'y3': [i[2] for i in wordData]})
-        df = df.set_index('x')
+        df = pd.DataFrame({"x": x,
+                           "y1": [i[0] for i in wordData],
+                           "y2": [i[1] for i in wordData],
+                           "y3": [i[2] for i in wordData]})
+        df = df.set_index("x")
 
         bottom = np.zeros(len(df))
-        cmap = cm.get_cmap('tab10')
+        cmap = cm.get_cmap("tab10")
         colors = [tuple(255*x for x in cmap(i/10))[:-1]
                   for i in range(len(df.columns))]
 
@@ -147,17 +147,17 @@ class Ui_graphScreen(object):
             else:
                 wordData.append([0, 0, 0, 0, 0, 0])
 
-        df = pd.DataFrame({'x': x,
-                           'y1': [i[0] for i in wordData],
-                           'y2': [i[1] for i in wordData],
-                           'y3': [i[2] for i in wordData],
-                           'y4': [i[3] for i in wordData],
-                           'y5': [i[4] for i in wordData],
-                           'y6': [i[5] for i in wordData]})
-        df = df.set_index('x')
+        df = pd.DataFrame({"x": x,
+                           "y1": [i[0] for i in wordData],
+                           "y2": [i[1] for i in wordData],
+                           "y3": [i[2] for i in wordData],
+                           "y4": [i[3] for i in wordData],
+                           "y5": [i[4] for i in wordData],
+                           "y6": [i[5] for i in wordData]})
+        df = df.set_index("x")
 
         bottom = np.zeros(len(df))
-        cmap = cm.get_cmap('tab10')
+        cmap = cm.get_cmap("tab10")
         colors = [tuple(255*x for x in cmap(i/10))[:-1]
                   for i in range(len(df.columns))]
 
@@ -182,17 +182,17 @@ class Ui_graphScreen(object):
             else:
                 wordData.append([0, 0, 0, 0, 0, 0])
 
-        df = pd.DataFrame({'x': x,
-                           'y1': [i[0] for i in wordData],
-                           'y2': [i[1] for i in wordData],
-                           'y3': [i[2] for i in wordData],
-                           'y4': [i[3] for i in wordData],
-                           'y5': [i[4] for i in wordData],
-                           'y6': [i[5] for i in wordData]})
-        df = df.set_index('x')
+        df = pd.DataFrame({"x": x,
+                           "y1": [i[0] for i in wordData],
+                           "y2": [i[1] for i in wordData],
+                           "y3": [i[2] for i in wordData],
+                           "y4": [i[3] for i in wordData],
+                           "y5": [i[4] for i in wordData],
+                           "y6": [i[5] for i in wordData]})
+        df = df.set_index("x")
 
         bottom = np.zeros(len(df))
-        cmap = cm.get_cmap('tab10')
+        cmap = cm.get_cmap("tab10")
         colors = [tuple(255*x for x in cmap(i/10))[:-1]
                   for i in range(len(df.columns))]
 
@@ -242,13 +242,13 @@ class Ui_graphScreen(object):
             average3.pop(0)
             average7.pop(0)
 
-        df = pd.DataFrame({'x': x,
-                           'y1': accuracyDaily,
-                           'y2': average3,
-                           'y3': average7})
-        df = df.set_index('x')
+        df = pd.DataFrame({"x": x,
+                           "y1": accuracyDaily,
+                           "y2": average3,
+                           "y3": average7})
+        df = df.set_index("x")
 
-        cmap = cm.get_cmap('tab10')
+        cmap = cm.get_cmap("tab10")
         colors = [tuple(255*x for x in cmap(i/10))[:-1]
                   for i in range(len(df.columns))]
 
@@ -283,16 +283,16 @@ class Ui_graphScreen(object):
                 wordData.append(self.data["logsSave"][str(
                     int(i)-(self.firstDay-self.d0)-1)]["5"])
 
-        df = pd.DataFrame({'x': x,
-                           'y1': [i[0] for i in wordData],
-                           'y2': [i[1] for i in wordData],
-                           'y3': [i[2] for i in wordData],
-                           'y4': [i[3] for i in wordData],
-                           'y5': [i[4] for i in wordData]})
-        df = df.set_index('x')
+        df = pd.DataFrame({"x": x,
+                           "y1": [i[0] for i in wordData],
+                           "y2": [i[1] for i in wordData],
+                           "y3": [i[2] for i in wordData],
+                           "y4": [i[3] for i in wordData],
+                           "y5": [i[4] for i in wordData]})
+        df = df.set_index("x")
 
         bottom = np.zeros(len(df))
-        cmap = cm.get_cmap('tab10')
+        cmap = cm.get_cmap("tab10")
         colors = [tuple(255*x for x in cmap(i/10))[:-1]
                   for i in range(len(df.columns))]
 

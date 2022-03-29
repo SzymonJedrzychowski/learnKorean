@@ -3,6 +3,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from modules import playControl
 from modules.clickableLabel import QLabelClickable
 from functools import partial
+import hashlib
 
 
 class Ui_learnWordsScreen(object):
@@ -144,7 +145,8 @@ class Ui_learnWordsScreen(object):
 
         koreanWord = self.koreanWordLabel.text()
         if koreanWord != "":
-            self.playControl.playSound("data/sounds/{}.mp3".format(koreanWord))
+            self.playControl.playSound(
+                "data/sounds/{}.mp3".format(hashlib.md5(koreanWord.encode("utf-8")).hexdigest()))
 
     def getTodayLearned(self):
         """Get list of words that were learned today
@@ -229,7 +231,7 @@ class Ui_learnWordsScreen(object):
                 self.todayLearnedLabel.setText(
                     "Today learned: {}".format(len(self.todayLearned)))
                 self.playControl.playSound(
-                    "data/sounds/{}.mp3".format(word["han"]))
+                    "data/sounds/{}.mp3".format(hashlib.md5(word["han"].encode("utf-8")).hexdigest()))
                 self.wordsToLearn.pop(0)
 
             else:
@@ -239,7 +241,7 @@ class Ui_learnWordsScreen(object):
                     "background: rgb(247, 81, 52); font-size: 18pt")
                 self.submitButton.setShortcut("Return")
                 self.playControl.playSound(
-                    "data/sounds/{}.mp3".format(word["han"]))
+                    "data/sounds/{}.mp3".format(hashlib.md5(word["han"].encode("utf-8")).hexdigest()))
 
             self.beingPressed = False
 
