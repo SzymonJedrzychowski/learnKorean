@@ -262,7 +262,7 @@ Version 2.0.8
 
 - Refactoring of the code,
 
-- Bux fix for situation when file cannot be loaded.
+- Bug fix for situation when file cannot be loaded.
 
 ----------------------------------------
 
@@ -273,3 +273,7 @@ Version 2.0.9
 - Refactoring of the code,
 
 - Bug fix that prevent sounds being played on Windows - sounds names are now saved as hash value, not Korean words.
+
+Version 2.0.10
+
+- Bug fix on logs page that prevented displaying accuracy and words daily graphs.

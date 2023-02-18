@@ -5,7 +5,7 @@ import json
 
 def load(lastFileTime: int):
     """Load file from the google drive
-    
+
     :param lastFileTime: time of last save of save file
     """
 

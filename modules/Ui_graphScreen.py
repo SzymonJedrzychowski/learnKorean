@@ -226,10 +226,13 @@ class Ui_graphScreen(object):
                 wordData.append([0, 0])
 
         accuracyDaily = [i[0]/i[1] if i[1] > 0 else 0 for i in wordData]
-        for i in range(len(accuracyDaily)):
+        i = 0
+        while i<len(accuracyDaily):
             if accuracyDaily[i] == 0:
                 accuracyDaily.pop(i)
                 x.pop(i)
+            else:
+                i+=1
 
         average3 = [sum(accuracyDaily[max(0, i-2):i+1])/min(i+1, 3)
                     for i in range(len(accuracyDaily))]
@@ -280,8 +283,7 @@ class Ui_graphScreen(object):
                 wordData.append(self.data["logsSave"][str(
                     int(i)-(self.firstDay-self.d0))]["5"])
             else:
-                wordData.append(self.data["logsSave"][str(
-                    int(i)-(self.firstDay-self.d0)-1)]["5"])
+                wordData.append(wordData[-1])
 
         df = pd.DataFrame({"x": x,
                            "y1": [i[0] for i in wordData],
